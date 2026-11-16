@@ -376,7 +376,15 @@ function generateTemplateFromPrompt(rawPrompt = '') {
     };
 
     // If healthcare/hospital specifically
-    if (presetClone.category.includes('Healthcare') || presetClone.keys.includes('hospital') || pLower.includes('hospital') || pLower.includes('doctor') || pLower.includes('clinic')) {
+    const isHealthcare =
+      (presetClone.category || '').includes('Healthcare') ||
+      (presetClone.keys && presetClone.keys.includes('hospital')) ||
+      pLower.includes('hospital') ||
+      pLower.includes('doctor') ||
+      pLower.includes('clinic') ||
+      pLower.includes('medical');
+
+    if (isHealthcare) {
       presetClone.defaultName = 'St. Jude & Hope Memorial Hospital';
       presetClone.tagline = 'Classic Vintage Care. Timeless Healing Heritage.';
       presetClone.subtagline = 'Serving families with compassionate bedside medicine, dedicated analog laboratory diagnostics, and 24-hour emergency rotary dispatch since 1978.';
@@ -431,7 +439,7 @@ function generateTemplateFromPrompt(rawPrompt = '') {
 function buildDynamicPreset(prompt) {
   // Extract custom title or words
   const words = prompt
-    .replace(/(make|create|build|a|website|for|my|the|an|page|app|platform)/gi, '')
+    .replace(/\\b(make|create|build|a|website|for|my|the|an|page|app|platform)\\b/gi, '')
     .trim();
 
   const titleWords = words.split(/\s+/).filter(Boolean);
@@ -482,8 +490,8 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
 
-  const services = \${JSON.stringify(services, null, 2)};
-  const team = \${JSON.stringify(team, null, 2)};
+  const services = ${JSON.stringify(services, null, 2)};
+  const team = ${JSON.stringify(team, null, 2)};
 
   const handleForm = (e) => {
     e.preventDefault();
@@ -491,40 +499,40 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-\${theme.bg} text-slate-100 font-sans selection:bg-\${primary}-500 selection:text-white">
+    <div className="min-h-screen bg-${theme.bg} text-slate-100 font-sans selection:bg-${primary}-500 selection:text-white">
       {/* Top Announcement Banner */}
-      <div className="bg-gradient-to-r from-\${primary}-700 to-\${theme.secondary}-700 text-white px-4 py-2 text-xs font-semibold">
+      <div className="bg-gradient-to-r from-${primary}-700 to-${theme.secondary}-700 text-white px-4 py-2 text-xs font-semibold">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <span>\${theme.badge}</span>
+          <span>${theme.badge}</span>
           <span className="hidden sm:inline font-mono">● Online & Accepting New Clients</span>
         </div>
       </div>
 
       {/* Main Navbar */}
-      <nav className="sticky top-0 z-40 backdrop-blur-xl bg-\${theme.bg}/90 border-b border-slate-800">
+      <nav className="sticky top-0 z-40 backdrop-blur-xl bg-${theme.bg}/90 border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-\${primary}-500 to-\${theme.secondary}-500 flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-\${primary}-500/25">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-${primary}-500 to-${theme.secondary}-500 flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-${primary}-500/25">
               ✦
             </div>
             <span className="font-extrabold text-xl tracking-tight text-white">
-              \${defaultName.split(' ')[0]} <span className="text-\${primary}-400 font-light text-sm">\${defaultName.split(' ').slice(1).join(' ')}</span>
+              ${defaultName.split(' ')[0]} <span className="text-${primary}-400 font-light text-sm">${defaultName.split(' ').slice(1).join(' ')}</span>
             </span>
           </div>
 
           <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
-            <a href="#services" className="hover:text-\${primary}-400 transition-colors">Services</a>
-            <a href="#about" className="hover:text-\${primary}-400 transition-colors">About Us</a>
-            <a href="#team" className="hover:text-\${primary}-400 transition-colors">Our Team</a>
-            <a href="#contact" className="hover:text-\${primary}-400 transition-colors">Contact</a>
+            <a href="#services" className="hover:text-${primary}-400 transition-colors">Services</a>
+            <a href="#about" className="hover:text-${primary}-400 transition-colors">About Us</a>
+            <a href="#team" className="hover:text-${primary}-400 transition-colors">Our Team</a>
+            <a href="#contact" className="hover:text-${primary}-400 transition-colors">Contact</a>
           </div>
 
           <div className="hidden sm:flex items-center space-x-4">
             <a
               href="#contact"
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-\${primary}-500 to-\${theme.secondary}-600 hover:from-\${primary}-400 hover:to-\${theme.secondary}-500 text-slate-950 font-bold text-xs shadow-lg shadow-\${primary}-500/25 transition-all hover:scale-102"
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-${primary}-500 to-${theme.secondary}-600 hover:from-${primary}-400 hover:to-${theme.secondary}-500 text-slate-950 font-bold text-xs shadow-lg shadow-${primary}-500/25 transition-all hover:scale-102"
             >
-              \${cta}
+              ${cta}
             </a>
           </div>
 
@@ -537,7 +545,7 @@ export default function App() {
           <div className="md:hidden px-4 py-4 bg-slate-950 border-b border-slate-800 space-y-2 text-sm">
             <a href="#services" className="block text-slate-300">Services</a>
             <a href="#team" className="block text-slate-300">Team</a>
-            <a href="#contact" className="block text-\${primary}-400 font-semibold">\${cta}</a>
+            <a href="#contact" className="block text-${primary}-400 font-semibold">${cta}</a>
           </div>
         )}
       </nav>
@@ -545,24 +553,24 @@ export default function App() {
       {/* Hero Section */}
       <section className="relative pt-20 pb-20 overflow-hidden text-center px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-\${primary}-500/30 bg-\${primary}-500/10 text-\${primary}-300 text-xs font-semibold mb-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-${primary}-500/30 bg-${primary}-500/10 text-${primary}-300 text-xs font-semibold mb-6">
             <span>⭐ Rated #1 in Quality & Customer Satisfaction</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight">
-            \${tagline}
+            ${tagline}
           </h1>
 
           <p className="mt-6 text-base sm:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            \${subtagline}
+            ${subtagline}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <a
               href="#contact"
-              className="px-7 py-3.5 rounded-xl bg-\${primary}-500 hover:bg-\${primary}-400 text-slate-950 font-bold text-sm shadow-xl shadow-\${primary}-500/20 transition-all hover:scale-105"
+              className="px-7 py-3.5 rounded-xl bg-${primary}-500 hover:bg-${primary}-400 text-slate-950 font-bold text-sm shadow-xl shadow-${primary}-500/20 transition-all hover:scale-105"
             >
-              \${cta}
+              ${cta}
             </a>
             <a
               href="#services"
@@ -575,7 +583,7 @@ export default function App() {
           {/* Quick Stats Grid */}
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
             <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-              <div className="text-3xl font-extrabold text-\${primary}-400">99.8%</div>
+              <div className="text-3xl font-extrabold text-${primary}-400">99.8%</div>
               <div className="text-xs text-slate-400 mt-1">Client Satisfaction</div>
             </div>
             <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
@@ -583,7 +591,7 @@ export default function App() {
               <div className="text-xs text-slate-400 mt-1">Happy Customers</div>
             </div>
             <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-              <div className="text-3xl font-extrabold text-\${theme.secondary}-400">15+ Yrs</div>
+              <div className="text-3xl font-extrabold text-${theme.secondary}-400">15+ Yrs</div>
               <div className="text-xs text-slate-400 mt-1">Proven Track Record</div>
             </div>
             <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
@@ -598,7 +606,7 @@ export default function App() {
       <section id="services" className="py-20 bg-slate-950/70 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-xs font-bold text-\${primary}-400 uppercase tracking-widest">What We Offer</h2>
+            <h2 className="text-xs font-bold text-${primary}-400 uppercase tracking-widest">What We Offer</h2>
             <p className="mt-3 text-3xl font-extrabold sm:text-4xl text-white">Full-Spectrum Capabilities</p>
             <p className="mt-3 text-slate-400 text-sm">Engineered with high standards, personalized attention, and modern technology.</p>
           </div>
@@ -607,18 +615,18 @@ export default function App() {
             {services.map((s, idx) => (
               <div
                 key={idx}
-                className="p-7 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-\${primary}-500/50 transition-all hover:-translate-y-1 group"
+                className="p-7 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-${primary}-500/50 transition-all hover:-translate-y-1 group"
               >
-                <div className="text-3xl mb-4 p-3 w-14 h-14 rounded-2xl bg-\${primary}-500/10 border border-\${primary}-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="text-3xl mb-4 p-3 w-14 h-14 rounded-2xl bg-${primary}-500/10 border border-${primary}-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                   {s.icon}
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-\${primary}-300 transition-colors">
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-${primary}-300 transition-colors">
                   {s.title}
                 </h3>
                 <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-4">
                   {s.desc}
                 </p>
-                <a href="#contact" className="text-\${primary}-400 text-xs font-bold inline-flex items-center gap-1 hover:underline">
+                <a href="#contact" className="text-${primary}-400 text-xs font-bold inline-flex items-center gap-1 hover:underline">
                   <span>Learn More</span> →
                 </a>
               </div>
@@ -631,18 +639,18 @@ export default function App() {
       <section id="team" className="py-20 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-xs font-bold text-\${primary}-400 uppercase tracking-widest">\${teamTitle}</h2>
+            <h2 className="text-xs font-bold text-${primary}-400 uppercase tracking-widest">${teamTitle}</h2>
             <p className="mt-3 text-3xl font-extrabold sm:text-4xl text-white">Meet Our Experts</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {team.map((m, idx) => (
-              <div key={idx} className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 text-center hover:border-\${primary}-500/40 transition-all">
-                <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-\${primary}-600 to-\${theme.secondary}-600 flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
+              <div key={idx} className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 text-center hover:border-${primary}-500/40 transition-all">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-${primary}-600 to-${theme.secondary}-600 flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
                   {m.name.charAt(0)}
                 </div>
                 <h4 className="font-bold text-white text-base">{m.name}</h4>
-                <p className="text-\${primary}-400 text-xs font-medium mt-1">{m.role}</p>
+                <p className="text-${primary}-400 text-xs font-medium mt-1">{m.role}</p>
                 <p className="text-slate-400 text-xs mt-2">{m.detail}</p>
                 <div className="text-amber-400 text-xs mt-2 font-mono">{m.rating}</div>
               </div>
@@ -680,7 +688,7 @@ export default function App() {
                       placeholder="e.g. John Doe"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-\${primary}-500"
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-${primary}-500"
                     />
                   </div>
                   <div>
@@ -691,7 +699,7 @@ export default function App() {
                       placeholder="contact@example.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-\${primary}-500"
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-${primary}-500"
                     />
                   </div>
                 </div>
@@ -703,13 +711,13 @@ export default function App() {
                     placeholder="Tell us about what you need..."
                     value={formData.note}
                     onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-\${primary}-500"
+                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-${primary}-500"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-\${primary}-500 to-\${theme.secondary}-600 hover:from-\${primary}-400 hover:to-\${theme.secondary}-500 text-slate-950 font-bold text-xs shadow-lg shadow-\${primary}-500/25 transition-all"
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-${primary}-500 to-${theme.secondary}-600 hover:from-${primary}-400 hover:to-${theme.secondary}-500 text-slate-950 font-bold text-xs shadow-lg shadow-${primary}-500/25 transition-all"
                 >
                   Submit Inquiry
                 </button>
@@ -723,7 +731,7 @@ export default function App() {
       <footer className="border-t border-slate-800 bg-slate-950 py-12 text-slate-400 text-xs text-center">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-white text-sm">\${defaultName}</span>
+            <span className="font-bold text-white text-sm">${defaultName}</span>
             <span>© {new Date().getFullYear()}. All rights reserved.</span>
           </div>
           <div className="flex space-x-6 text-slate-500">
@@ -749,10 +757,10 @@ export default function App() {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>\${defaultName}</title>
+    <title>${defaultName}</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body class="bg-\${theme.bg}">
+  <body class="bg-${theme.bg}">
     <div id="root"></div>
   </body>
 </html>`
@@ -770,8 +778,8 @@ export default function App() {
   const [submitted, setSubmitted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const services = \${JSON.stringify(services, null, 2)};
-  const team = \${JSON.stringify(team, null, 2)};
+  const services = ${JSON.stringify(services, null, 2)};
+  const team = ${JSON.stringify(team, null, 2)};
 
   const handleForm = (e) => {
     e.preventDefault();
@@ -784,7 +792,7 @@ export default function App() {
       <div className="bg-gradient-to-r from-amber-700 via-orange-600 to-yellow-600 text-stone-950 px-4 py-2 text-xs font-mono font-bold tracking-wider border-b-2 border-stone-900">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span>\${theme.badge || '📼 VINTAGE RETRO ARCHIVE • EST. 1978'}</span>
+            <span>${theme.badge || '📼 VINTAGE RETRO ARCHIVE • EST. 1978'}</span>
           </div>
           <span className="hidden sm:inline bg-stone-950 text-amber-300 px-2 py-0.5 text-[11px] border border-amber-500/50">
             ● ANALOG ARCHIVE ONLINE
@@ -801,7 +809,7 @@ export default function App() {
             </div>
             <div>
               <span className="font-serif font-black text-xl tracking-tight text-amber-100 block sm:inline">
-                \${defaultName.split(' ')[0]}
+                ${defaultName.split(' ')[0]}
               </span>
               <span className="font-mono text-xs uppercase tracking-widest text-amber-400 bg-amber-950/80 border border-amber-600/50 px-2 py-0.5 ml-0 sm:ml-2">
                 EST. 1978
@@ -821,7 +829,7 @@ export default function App() {
               href="#contact"
               className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-stone-950 font-mono font-black uppercase text-xs border-2 border-stone-900 shadow-[4px_4px_0px_0px_#92400e] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
             >
-              \${cta || 'Patient Intake'}
+              ${cta || 'Patient Intake'}
             </a>
           </div>
 
@@ -834,7 +842,7 @@ export default function App() {
           <div className="md:hidden px-4 py-4 bg-stone-900 border-b-2 border-amber-600 space-y-2 text-xs font-mono uppercase">
             <a href="#services" className="block text-amber-200 py-1">Departments</a>
             <a href="#team" className="block text-amber-200 py-1">Faculty</a>
-            <a href="#contact" className="block text-amber-400 font-bold py-1">\${cta || 'Patient Intake'}</a>
+            <a href="#contact" className="block text-amber-400 font-bold py-1">${cta || 'Patient Intake'}</a>
           </div>
         )}
       </nav>
@@ -847,11 +855,11 @@ export default function App() {
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-black tracking-tight text-amber-100 leading-tight">
-            \${tagline}
+            ${tagline}
           </h1>
 
           <p className="mt-6 text-sm sm:text-lg text-amber-200/80 max-w-2xl mx-auto leading-relaxed font-mono">
-            \${subtagline}
+            ${subtagline}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -859,7 +867,7 @@ export default function App() {
               href="#contact"
               className="px-7 py-3.5 bg-amber-400 hover:bg-amber-300 text-stone-950 font-mono font-black uppercase text-xs sm:text-sm border-2 border-stone-900 shadow-[5px_5px_0px_0px_#92400e] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
             >
-              \${cta || 'Book Consultation'}
+              ${cta || 'Book Consultation'}
             </a>
             <a
               href="#services"
@@ -941,7 +949,7 @@ export default function App() {
               [ OFFICIAL REGISTRY ]
             </span>
             <h2 className="mt-4 text-3xl font-serif font-black sm:text-5xl text-amber-100">
-              \${teamTitle || 'Distinguished Practitioners'}
+              ${teamTitle || 'Distinguished Practitioners'}
             </h2>
           </div>
 
@@ -1065,7 +1073,7 @@ export default function App() {
       <footer className="border-t-4 border-amber-700/80 bg-stone-950 py-12 text-amber-300/70 font-mono text-xs text-center">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-amber-100 text-sm font-serif">\${defaultName}</span>
+            <span className="font-bold text-amber-100 text-sm font-serif">${defaultName}</span>
             <span>© 1978–{new Date().getFullYear()}. All rights reserved.</span>
           </div>
           <div className="text-amber-400 font-mono">
@@ -1094,7 +1102,7 @@ export default function App() {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>\${defaultName}</title>
+    <title>${defaultName}</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-stone-950">
@@ -1115,8 +1123,8 @@ export default function App() {
   const [submitted, setSubmitted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const services = \${JSON.stringify(services, null, 2)};
-  const team = \${JSON.stringify(team, null, 2)};
+  const services = ${JSON.stringify(services, null, 2)};
+  const team = ${JSON.stringify(team, null, 2)};
 
   const handleForm = (e) => {
     e.preventDefault();
@@ -1141,7 +1149,7 @@ export default function App() {
               ⚡
             </div>
             <span className="font-black text-lg tracking-widest text-white">
-              \${defaultName} <span className="text-fuchsia-400 text-xs">[2099.V2]</span>
+              ${defaultName} <span className="text-fuchsia-400 text-xs">[2099.V2]</span>
             </span>
           </div>
 
@@ -1156,7 +1164,7 @@ export default function App() {
               href="#contact"
               className="px-5 py-2 bg-fuchsia-600 hover:bg-fuchsia-500 text-black font-black uppercase text-xs tracking-wider border border-fuchsia-300 shadow-[0_0_15px_rgba(217,70,239,0.6)] hover:shadow-[0_0_25px_rgba(217,70,239,0.9)] transition-all"
             >
-              \${cta || 'INITIATE PROTOCOL'}
+              ${cta || 'INITIATE PROTOCOL'}
             </a>
           </div>
 
@@ -1169,7 +1177,7 @@ export default function App() {
           <div className="md:hidden px-4 py-4 bg-zinc-950 border-b border-fuchsia-500 space-y-2 text-xs">
             <a href="#services" className="block text-cyan-300">// MODULES</a>
             <a href="#team" className="block text-cyan-300">// OPERATORS</a>
-            <a href="#contact" className="block text-fuchsia-400 font-bold">\${cta || 'INITIATE'}</a>
+            <a href="#contact" className="block text-fuchsia-400 font-bold">${cta || 'INITIATE'}</a>
           </div>
         )}
       </nav>
@@ -1182,11 +1190,11 @@ export default function App() {
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-tight">
-            \${tagline}
+            ${tagline}
           </h1>
 
           <p className="mt-6 text-sm sm:text-lg text-cyan-300/80 max-w-2xl mx-auto leading-relaxed">
-            \${subtagline}
+            ${subtagline}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -1194,7 +1202,7 @@ export default function App() {
               href="#contact"
               className="px-7 py-3.5 bg-fuchsia-600 hover:bg-fuchsia-500 text-black font-black uppercase text-xs sm:text-sm border border-fuchsia-300 shadow-[0_0_20px_rgba(217,70,239,0.7)] transition-all"
             >
-              \${cta || 'ACTIVATE UPLINK'}
+              ${cta || 'ACTIVATE UPLINK'}
             </a>
             <a
               href="#services"
@@ -1263,7 +1271,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-xs font-black text-cyan-400 uppercase tracking-widest">// ARCHITECTS</h2>
-            <p className="mt-3 text-3xl font-black sm:text-5xl text-white">\${teamTitle || 'System Operators'}</p>
+            <p className="mt-3 text-3xl font-black sm:text-5xl text-white">${teamTitle || 'System Operators'}</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -1356,7 +1364,7 @@ export default function App() {
       <footer className="border-t border-cyan-500/30 bg-black py-12 text-zinc-500 text-xs text-center">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-white text-sm">\${defaultName}</span>
+            <span className="font-bold text-white text-sm">${defaultName}</span>
             <span>// YEAR 2099 CYBER PROTOCOL.</span>
           </div>
           <div className="flex space-x-6 text-cyan-400">
@@ -1382,7 +1390,7 @@ export default function App() {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>\${defaultName}</title>
+    <title>${defaultName}</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-black">
@@ -1403,8 +1411,8 @@ export default function App() {
   const [submitted, setSubmitted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const services = \${JSON.stringify(services, null, 2)};
-  const team = \${JSON.stringify(team, null, 2)};
+  const services = ${JSON.stringify(services, null, 2)};
+  const team = ${JSON.stringify(team, null, 2)};
 
   const handleForm = (e) => {
     e.preventDefault();
@@ -1425,7 +1433,7 @@ export default function App() {
       <nav className="sticky top-0 z-40 bg-black border-b-2 border-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
           <span className="font-bold text-lg uppercase tracking-widest">
-            ■ \${defaultName}
+            ■ ${defaultName}
           </span>
 
           <div className="hidden md:flex items-center space-x-8 text-xs font-bold uppercase tracking-widest">
@@ -1438,7 +1446,7 @@ export default function App() {
             href="#contact"
             className="px-5 py-2.5 bg-white text-black font-bold uppercase text-xs border-2 border-white hover:bg-black hover:text-white transition-all"
           >
-            \${cta || 'Connect'}
+            ${cta || 'Connect'}
           </a>
         </div>
       </nav>
@@ -1446,14 +1454,14 @@ export default function App() {
       {/* Hero */}
       <section className="py-24 px-4 text-left max-w-7xl mx-auto border-b-2 border-white">
         <h1 className="text-4xl sm:text-7xl font-bold uppercase tracking-tight leading-none">
-          \${tagline}
+          ${tagline}
         </h1>
         <p className="mt-8 text-base sm:text-xl text-zinc-400 max-w-3xl leading-relaxed">
-          \${subtagline}
+          ${subtagline}
         </p>
         <div className="mt-10 flex gap-4">
           <a href="#contact" className="px-8 py-4 bg-white text-black font-bold uppercase text-xs border-2 border-white hover:bg-black hover:text-white transition-all">
-            \${cta || 'Initiate Contact'}
+            ${cta || 'Initiate Contact'}
           </a>
         </div>
       </section>
@@ -1520,7 +1528,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t-2 border-white py-8 text-center text-xs text-zinc-500 uppercase">
-        \${defaultName} — All Rights Reserved.
+        ${defaultName} — All Rights Reserved.
       </footer>
     </div>
   );
@@ -1538,7 +1546,7 @@ export default function App() {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>\${defaultName}</title>
+    <title>${defaultName}</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-black">
