@@ -127,10 +127,10 @@ function cleanAndParseJSON(rawText) {
 /**
  * Generate a website from user prompt
  */
-async function generateWebsite(prompt) {
-  const geminiKey = process.env.GEMINI_API_KEY;
-  const openrouterKey = process.env.OPENROUTER_API_KEY;
-  const provider = process.env.AI_PROVIDER || (geminiKey ? 'gemini' : openrouterKey ? 'openrouter' : 'template');
+async function generateWebsite(prompt, options = {}) {
+  const geminiKey = options.geminiKey || process.env.GEMINI_API_KEY;
+  const openrouterKey = options.openrouterKey || process.env.OPENROUTER_API_KEY;
+  const provider = options.provider || process.env.AI_PROVIDER || (geminiKey ? 'gemini' : openrouterKey ? 'openrouter' : 'universal');
 
   try {
     if (provider === 'gemini' && geminiKey && geminiKey.trim() !== '') {
@@ -143,12 +143,12 @@ async function generateWebsite(prompt) {
       return await callOpenRouter(openrouterKey, prompt);
     }
 
-    // Default or Fallback to built-in smart template engine
-    console.log('🤖 Using built-in smart template engine (Zero-API Key / Offline)...');
+    // Default or Fallback to built-in universal smart template engine
+    console.log('🤖 Using built-in universal synthesis engine (Zero-API Key / Offline)...');
     return generateTemplateFromPrompt(prompt);
   } catch (error) {
     console.warn(`⚠️ Primary AI generation encountered an error: ${error.message}`);
-    console.log('ℹ️ Smoothly falling back to built-in smart template engine...');
+    console.log('ℹ️ Smoothly falling back to built-in universal synthesis engine...');
     return generateTemplateFromPrompt(prompt);
   }
 }
@@ -156,9 +156,9 @@ async function generateWebsite(prompt) {
 /**
  * Refine/Edit an existing website using follow-up prompt
  */
-async function refineWebsite({ prompt, currentFiles, customApiKey }) {
-  const geminiKey = customApiKey || process.env.GEMINI_API_KEY;
-  const openrouterKey = process.env.OPENROUTER_API_KEY;
+async function refineWebsite({ prompt, currentFiles, geminiKey: optGemini, openrouterKey: optOpenRouter, provider: optProvider }) {
+  const geminiKey = optGemini || process.env.GEMINI_API_KEY;
+  const openrouterKey = optOpenRouter || process.env.OPENROUTER_API_KEY;
 
   const currentCode = typeof currentFiles === 'object' ? JSON.stringify(currentFiles, null, 2) : String(currentFiles);
 

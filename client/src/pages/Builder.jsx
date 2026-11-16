@@ -24,11 +24,13 @@ import {
   Loader2,
   Wand2,
   Lightbulb,
-  RotateCw
+  RotateCw,
+  Key
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
 import ExportModal from '../components/ExportModal';
+import ApiKeyModal from '../components/ApiKeyModal';
 import { getClientTemplate } from '../utils/clientTemplateService';
 
 // Helper component inside SandpackProvider to sync files for Export & Save
@@ -72,6 +74,7 @@ export default function Builder() {
   const [statusText, setStatusText] = useState('');
   const [saving, setSaving] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [apiKeyModalOpen, setApiKeyModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Chat message history
@@ -389,8 +392,17 @@ export default function Builder() {
           </div>
         )}
 
-        {/* Actions: Reload, Save, Export */}
+        {/* Actions: AI Keys, Reload, Save, Export */}
         <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setApiKeyModalOpen(true)}
+            title="Configure AI Models & Keys"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white text-xs font-semibold transition-colors"
+          >
+            <Key className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden sm:inline">AI Keys</span>
+          </button>
+
           <button
             onClick={() => setRefreshKey((k) => k + 1)}
             title="Reload Preview"
@@ -606,6 +618,12 @@ export default function Builder() {
         onClose={() => setIsExportOpen(false)}
         projectTitle={projectTitle}
         files={currentWorkingFiles}
+      />
+
+      {/* AI Key & Settings Modal */}
+      <ApiKeyModal
+        isOpen={apiKeyModalOpen}
+        onClose={() => setApiKeyModalOpen(false)}
       />
     </div>
   );

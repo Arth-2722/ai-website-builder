@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, Code2, Globe, FolderGit2, Plus, LogOut, User as UserIcon } from 'lucide-react';
+import { Sparkles, Code2, Globe, FolderGit2, Plus, LogOut, User as UserIcon, Key } from 'lucide-react';
+import ApiKeyModal from './ApiKeyModal';
 
 export default function Navbar() {
   const { user, logout, setAuthModalOpen } = useAuth();
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [apiKeyModalOpen, setApiKeyModalOpen] = useState(false);
 
   const isActive = (path) => location.pathname === path;
 
@@ -63,6 +65,15 @@ export default function Navbar() {
 
         {/* Action Buttons & Auth */}
         <div className="flex items-center space-x-3">
+          <button
+            onClick={() => setApiKeyModalOpen(true)}
+            title="Configure Free AI Keys"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white text-xs font-semibold transition-colors"
+          >
+            <Key className="w-3.5 h-3.5 text-amber-400" />
+            <span>AI Keys</span>
+          </button>
+
           <Link
             to="/builder"
             className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-md shadow-brand-600/25 transition-all hover:scale-102 active:scale-98"
@@ -122,6 +133,11 @@ export default function Navbar() {
           )}
         </div>
       </div>
+
+      <ApiKeyModal
+        isOpen={apiKeyModalOpen}
+        onClose={() => setApiKeyModalOpen(false)}
+      />
     </header>
   );
 }
