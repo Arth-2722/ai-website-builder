@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import Builder from './pages/Builder';
 import Dashboard from './pages/Dashboard';
 import Community from './pages/Community';
+import Pricing from './pages/Pricing';
 
 export default function App() {
   const location = useLocation();
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/builder/:id" element={<Builder />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/community" element={<Community />} />
+          <Route path="/pricing" element={<Pricing />} />
         </Routes>
       </div>
 

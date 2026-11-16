@@ -61,6 +61,14 @@ export default function Navbar() {
           >
             Explore
           </Link>
+          <Link
+            to="/pricing"
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+              isActive('/pricing') ? 'text-white bg-slate-800/80' : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            }`}
+          >
+            Pricing
+          </Link>
         </nav>
 
         {/* Action Buttons & Auth */}

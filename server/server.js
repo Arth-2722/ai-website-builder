@@ -56,7 +56,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 AI Website Builder Server listening on port ${PORT}`);
-  console.log(`🌐 API Endpoint: http://localhost:${PORT}/api`);
-});
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 AI Website Builder Server listening on port ${PORT}`);
+    console.log(`🌐 API Endpoint: http://localhost:${PORT}/api`);
+  });
+}
+
+module.exports = app;
