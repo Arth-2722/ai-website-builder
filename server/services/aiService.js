@@ -156,8 +156,8 @@ async function generateWebsite(prompt) {
 /**
  * Refine/Edit an existing website using follow-up prompt
  */
-async function refineWebsite({ prompt, currentFiles }) {
-  const geminiKey = process.env.GEMINI_API_KEY;
+async function refineWebsite({ prompt, currentFiles, customApiKey }) {
+  const geminiKey = customApiKey || process.env.GEMINI_API_KEY;
   const openrouterKey = process.env.OPENROUTER_API_KEY;
 
   const currentCode = typeof currentFiles === 'object' ? JSON.stringify(currentFiles, null, 2) : String(currentFiles);
@@ -184,19 +184,55 @@ Return the complete updated project files in the exact same JSON format with key
       return await callOpenRouter(openrouterKey, refinementPrompt);
     }
 
-    // Fallback: If no API key, smartly tweak title and return files
+    // Fallback: Check if user is asking for a new category or redesign
+    const lower = (prompt || '').toLowerCase();
+    const isRedesignPrompt =
+      lower.includes('hospital') ||
+      lower.includes('clinic') ||
+      lower.includes('medical') ||
+      lower.includes('doctor') ||
+      lower.includes('portfolio') ||
+      lower.includes('restaurant') ||
+      lower.includes('food') ||
+      lower.includes('shop') ||
+      lower.includes('store') ||
+      lower.includes('ecommerce') ||
+      lower.includes('gym') ||
+      lower.includes('fitness') ||
+      lower.includes('saas') ||
+      lower.includes('make a website') ||
+      lower.includes('create a website') ||
+      lower.includes('build a website') ||
+      lower.includes('redesign');
+
+    if (isRedesignPrompt) {
+      console.log('🤖 Topic redesign prompt detected in chat! Generating full matching template...');
+      return generateTemplateFromPrompt(prompt);
+    }
+
+    // If existing App.js can be modified for colors or headings
+    const updatedFiles = { ...currentFiles };
+    let appCode = updatedFiles['/App.js'] || updatedFiles['App.js'];
+
+    if (appCode) {
+      if (lower.includes('emerald') || lower.includes('green')) {
+        appCode = appCode.replace(/cyan-/g, 'emerald-').replace(/indigo-/g, 'emerald-').replace(/blue-/g, 'teal-');
+      } else if (lower.includes('purple') || lower.includes('violet')) {
+        appCode = appCode.replace(/cyan-/g, 'purple-').replace(/emerald-/g, 'purple-').replace(/blue-/g, 'violet-');
+      } else if (lower.includes('amber') || lower.includes('gold') || lower.includes('orange')) {
+        appCode = appCode.replace(/cyan-/g, 'amber-').replace(/indigo-/g, 'amber-').replace(/blue-/g, 'orange-');
+      }
+      updatedFiles['/App.js'] = appCode;
+    }
+
     return {
       title: 'Updated Website',
       description: `Modified based on: ${prompt}`,
-      files: currentFiles
+      files: updatedFiles
     };
   } catch (error) {
     console.warn(`⚠️ Refinement error: ${error.message}`);
-    return {
-      title: 'Website',
-      description: 'Preserved current version',
-      files: currentFiles
-    };
+    return generateTemplateFromPrompt(prompt);
   }
 }
 

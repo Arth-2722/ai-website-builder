@@ -8,11 +8,13 @@ function generateTemplateFromPrompt(prompt) {
   const p = prompt.toLowerCase();
 
   let category = 'saas';
-  if (p.includes('portfolio') || p.includes('resume') || p.includes('developer') || p.includes('designer')) {
+  if (p.includes('hospital') || p.includes('clinic') || p.includes('doctor') || p.includes('medical') || p.includes('healthcare') || p.includes('patient') || p.includes('dental') || p.includes('pharmacy') || p.includes('nurse')) {
+    category = 'hospital';
+  } else if (p.includes('portfolio') || p.includes('resume') || p.includes('developer') || p.includes('designer')) {
     category = 'portfolio';
-  } else if (p.includes('food') || p.includes('restaurant') || p.includes('cafe') || p.includes('bakery') || p.includes('menu') || p.includes('coffee')) {
+  } else if (p.includes('food') || p.includes('restaurant') || p.includes('cafe') || p.includes('bakery') || p.includes('menu') || p.includes('coffee') || p.includes('pizza') || p.includes('burger')) {
     category = 'restaurant';
-  } else if (p.includes('shop') || p.includes('store') || p.includes('ecommerce') || p.includes('product') || p.includes('sneaker')) {
+  } else if (p.includes('shop') || p.includes('store') || p.includes('ecommerce') || p.includes('product') || p.includes('sneaker') || p.includes('fashion') || p.includes('clothing')) {
     category = 'ecommerce';
   } else if (p.includes('agency') || p.includes('marketing') || p.includes('studio') || p.includes('consulting')) {
     category = 'agency';
@@ -21,6 +23,8 @@ function generateTemplateFromPrompt(prompt) {
   }
 
   switch (category) {
+    case 'hospital':
+      return createHospitalTemplate(prompt);
     case 'portfolio':
       return createPortfolioTemplate(prompt);
     case 'restaurant':
@@ -35,6 +39,438 @@ function generateTemplateFromPrompt(prompt) {
     default:
       return createSaaSTemplate(prompt);
   }
+}
+
+function createHospitalTemplate(prompt) {
+  return {
+    title: 'HopeCare Memorial Hospital & Health System',
+    description: 'Modern hospital and healthcare portal with interactive appointment booking, doctor directory, and emergency services.',
+    files: {
+      '/App.js': `import React, { useState } from 'react';
+
+export default function App() {
+  const [selectedDept, setSelectedDept] = useState('all');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [appointment, setAppointment] = useState({
+    patientName: '',
+    phone: '',
+    department: 'Cardiology',
+    doctor: 'Dr. Sarah Jenkins',
+    date: '',
+    notes: ''
+  });
+  const [booked, setBooked] = useState(false);
+
+  const departments = [
+    { id: 'cardiology', name: 'Cardiology', icon: '❤️', desc: 'Comprehensive cardiac care, diagnostics, and advanced catheterization procedures.' },
+    { id: 'neurology', name: 'Neurology', icon: '🧠', desc: 'World-class stroke care, neurosurgery, and comprehensive spinal treatments.' },
+    { id: 'pediatrics', name: 'Pediatrics', icon: '👶', desc: 'Compassionate 24/7 neonatal ICU and child wellness healthcare programs.' },
+    { id: 'orthopedics', name: 'Orthopedics', icon: '🦴', desc: 'Minimally invasive joint replacement, sports medicine, and trauma reconstruction.' },
+    { id: 'oncology', name: 'Oncology', icon: '🔬', desc: 'Precision cancer therapies, radiation oncology, and holistic immunotherapy.' },
+    { id: 'emergency', name: 'Emergency Care', icon: '🚑', desc: 'Level 1 Trauma Center with 24/7 rapid ambulance dispatch and dedicated ICU.' }
+  ];
+
+  const doctors = [
+    {
+      name: 'Dr. Sarah Jenkins, MD',
+      role: 'Chief of Cardiology',
+      dept: 'Cardiology',
+      experience: '18 Years Experience',
+      rating: '4.9 ★★★★★ (240 reviews)'
+    },
+    {
+      name: 'Dr. Michael Chen, MD, PhD',
+      role: 'Head of Neurovascular Surgery',
+      dept: 'Neurology',
+      experience: '15 Years Experience',
+      rating: '4.9 ★★★★★ (185 reviews)'
+    },
+    {
+      name: 'Dr. Elena Rostova, MD',
+      role: 'Pediatric Specialist',
+      dept: 'Pediatrics',
+      experience: '12 Years Experience',
+      rating: '5.0 ★★★★★ (310 reviews)'
+    },
+    {
+      name: 'Dr. Marcus Vance, MD',
+      role: 'Orthopedic Trauma Surgeon',
+      dept: 'Orthopedics',
+      experience: '16 Years Experience',
+      rating: '4.8 ★★★★★ (190 reviews)'
+    }
+  ];
+
+  const handleBooking = (e) => {
+    e.preventDefault();
+    if (appointment.patientName && appointment.phone) {
+      setBooked(true);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-cyan-500 selection:text-white">
+      {/* 24/7 Emergency Alert Banner */}
+      <div className="bg-gradient-to-r from-rose-700 via-rose-600 to-red-700 text-white px-4 py-2 text-xs font-semibold flex items-center justify-between shadow-md">
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <span className="animate-pulse">🚨</span>
+            <span>24/7 Emergency Center & Ambulance Dispatch:</span>
+            <span className="underline font-bold text-amber-200">+1 (800) 911-HOPE</span>
+          </div>
+          <div className="hidden sm:flex items-center space-x-4 text-[11px] opacity-90">
+            <span>● Level 1 Trauma Center</span>
+            <span>● Walk-in Urgent Care Open</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navigation */}
+      <nav className="sticky top-0 z-40 backdrop-blur-xl bg-slate-900/90 border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-cyan-500/20 font-bold">
+              ✚
+            </div>
+            <div>
+              <span className="font-extrabold text-xl tracking-tight text-white block">
+                HopeCare <span className="text-cyan-400 font-normal text-sm">Hospital</span>
+              </span>
+              <span className="text-[10px] text-slate-400 tracking-wider uppercase block font-mono">
+                Medical & Research Center
+              </span>
+            </div>
+          </div>
+
+          <div className="hidden lg:flex items-center space-x-8 text-sm font-medium text-slate-300">
+            <a href="#departments" className="hover:text-cyan-400 transition-colors">Departments</a>
+            <a href="#doctors" className="hover:text-cyan-400 transition-colors">Specialists</a>
+            <a href="#services" className="hover:text-cyan-400 transition-colors">Patient Services</a>
+            <a href="#appointment" className="hover:text-cyan-400 transition-colors">Appointments</a>
+            <a href="#contact" className="hover:text-cyan-400 transition-colors">Contact</a>
+          </div>
+
+          <div className="hidden sm:flex items-center space-x-4">
+            <a
+              href="#appointment"
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/25 transition-all hover:scale-102"
+            >
+              Book Appointment
+            </a>
+          </div>
+
+          {/* Mobile hamburger */}
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-2 text-slate-300 hover:text-white"
+          >
+            ☰
+          </button>
+        </div>
+
+        {mobileMenuOpen && (
+          <div className="lg:hidden px-4 py-4 bg-slate-950 border-b border-slate-800 space-y-3 text-sm">
+            <a href="#departments" className="block text-slate-300">Departments</a>
+            <a href="#doctors" className="block text-slate-300">Doctors</a>
+            <a href="#appointment" className="block text-cyan-400 font-semibold">Book Appointment</a>
+          </div>
+        )}
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative pt-20 pb-24 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-cyan-900/20 via-slate-900 to-slate-950 -z-10" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-7 text-left">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 text-xs font-semibold mb-6">
+                <span>🛡️ Ranked #1 Regional Hospital for Clinical Excellence</span>
+              </div>
+
+              <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight">
+                Compassionate Care.{' '}
+                <br />
+                <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-400 bg-clip-text text-transparent">
+                  World-Class Medicine.
+                </span>
+              </h1>
+
+              <p className="mt-6 text-base sm:text-lg text-slate-300 max-w-xl leading-relaxed">
+                Dedicated to providing patient-centered, advanced healthcare with over 150+ board-certified medical specialists, state-of-the-art robotic surgery, and comprehensive 24/7 trauma emergency care.
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-4">
+                <a
+                  href="#appointment"
+                  className="px-6 py-3.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm shadow-xl shadow-cyan-500/20 transition-all hover:scale-102"
+                >
+                  Schedule Consultation
+                </a>
+                <a
+                  href="#doctors"
+                  className="px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm border border-slate-700 transition-all"
+                >
+                  Meet Our Doctors
+                </a>
+              </div>
+
+              {/* Hospital Trust Badges */}
+              <div className="mt-12 grid grid-cols-3 gap-6 pt-8 border-t border-slate-800">
+                <div>
+                  <div className="text-2xl sm:text-3xl font-extrabold text-cyan-400">99.4%</div>
+                  <div className="text-xs text-slate-400 mt-1">Patient Satisfaction</div>
+                </div>
+                <div>
+                  <div className="text-2xl sm:text-3xl font-extrabold text-white">150+</div>
+                  <div className="text-xs text-slate-400 mt-1">Specialist Doctors</div>
+                </div>
+                <div>
+                  <div className="text-2xl sm:text-3xl font-extrabold text-teal-400">24/7</div>
+                  <div className="text-xs text-slate-400 mt-1">Emergency & ICU</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Emergency / Consultation Card */}
+            <div className="lg:col-span-5">
+              <div className="p-8 rounded-3xl bg-slate-950/80 border border-slate-800 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl -z-10" />
+
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-lg">
+                    📅
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Book an Appointment</h3>
+                    <p className="text-xs text-slate-400">Instant confirmation & same-day slots</p>
+                  </div>
+                </div>
+
+                {booked ? (
+                  <div className="p-6 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 text-emerald-300 text-sm text-center">
+                    <div className="text-3xl mb-2">✅</div>
+                    <h4 className="font-bold text-base text-white">Appointment Confirmed!</h4>
+                    <p className="mt-2 text-xs text-emerald-200">
+                      Thank you, {appointment.patientName}. We have reserved your visit with {appointment.doctor} ({appointment.department}). Confirmation sent to {appointment.phone}.
+                    </p>
+                    <button
+                      onClick={() => setBooked(false)}
+                      className="mt-5 px-4 py-2 rounded-xl bg-slate-800 text-white text-xs font-semibold hover:bg-slate-700"
+                    >
+                      Book Another Visit
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleBooking} className="space-y-4 text-left">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">Patient Full Name</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Johnathan Davis"
+                        value={appointment.patientName}
+                        onChange={(e) => setAppointment({ ...appointment, patientName: e.target.value })}
+                        className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1">Phone Number</label>
+                        <input
+                          type="tel"
+                          required
+                          placeholder="+1 (555) 000-0000"
+                          value={appointment.phone}
+                          onChange={(e) => setAppointment({ ...appointment, phone: e.target.value })}
+                          className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1">Department</label>
+                        <select
+                          value={appointment.department}
+                          onChange={(e) => setAppointment({ ...appointment, department: e.target.value })}
+                          className="w-full px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-500"
+                        >
+                          <option>Cardiology</option>
+                          <option>Neurology</option>
+                          <option>Pediatrics</option>
+                          <option>Orthopedics</option>
+                          <option>General Medicine</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">Preferred Date</label>
+                      <input
+                        type="date"
+                        required
+                        value={appointment.date}
+                        onChange={(e) => setAppointment({ ...appointment, date: e.target.value })}
+                        className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-500"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full mt-2 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs shadow-lg shadow-cyan-500/25 transition-all"
+                    >
+                      Confirm Appointment Booking
+                    </button>
+                    <p className="text-[11px] text-slate-500 text-center">
+                      🔒 HIPPA Compliant & 100% Confidential
+                    </p>
+                  </form>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Medical Departments Section */}
+      <section id="departments" className="py-20 bg-slate-950/60 border-t border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-xs font-bold text-cyan-400 uppercase tracking-widest">Centers of Clinical Excellence</h2>
+            <p className="mt-3 text-3xl font-extrabold sm:text-4xl text-white">Specialized Medical Departments</p>
+            <p className="mt-3 text-slate-400 text-sm">Equipped with cutting-edge medical technologies and multidisciplinary care teams.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {departments.map((d) => (
+              <div
+                key={d.id}
+                className="p-7 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-cyan-500/50 transition-all hover:-translate-y-1 group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                  {d.icon}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">
+                  {d.name}
+                </h3>
+                <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-4">
+                  {d.desc}
+                </p>
+                <a href="#appointment" className="text-cyan-400 text-xs font-bold inline-flex items-center gap-1 hover:underline">
+                  <span>Schedule Consultation</span> →
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Specialist Doctors Directory */}
+      <section id="doctors" className="py-20 border-t border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-xs font-bold text-cyan-400 uppercase tracking-widest">Medical Faculty</h2>
+            <p className="mt-3 text-3xl font-extrabold sm:text-4xl text-white">Distinguished Specialists</p>
+            <p className="mt-3 text-slate-400 text-sm">Meet our department heads and leading healthcare practitioners.</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {doctors.map((doc, idx) => (
+              <div
+                key={idx}
+                className="p-6 rounded-2xl bg-slate-950 border border-slate-800 text-center hover:border-cyan-500/40 transition-all"
+              >
+                <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-lg">
+                  {doc.name.charAt(4)}
+                </div>
+                <h4 className="font-bold text-white text-base">{doc.name}</h4>
+                <p className="text-cyan-400 text-xs font-medium mt-1">{doc.role}</p>
+                <p className="text-slate-400 text-xs mt-2">{doc.experience}</p>
+                <div className="text-amber-400 text-xs mt-2 font-mono">{doc.rating}</div>
+                <a
+                  href="#appointment"
+                  className="mt-5 block w-full py-2 bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-white rounded-lg text-xs font-bold transition-all"
+                >
+                  Book with Doctor
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Patient Care & Insurance */}
+      <section id="services" className="py-16 bg-slate-950/40 border-t border-slate-800 text-center">
+        <div className="max-w-6xl mx-auto px-4">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Accepted Insurance Providers</h3>
+          <p className="text-xs text-slate-500 mt-1">We accept over 40+ major health insurance networks and Medicare plans</p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-8 text-slate-400 font-bold text-sm">
+            <span className="p-3 bg-slate-900 rounded-xl border border-slate-800">BlueCross BlueShield</span>
+            <span className="p-3 bg-slate-900 rounded-xl border border-slate-800">UnitedHealthcare</span>
+            <span className="p-3 bg-slate-900 rounded-xl border border-slate-800">Medicare & Medicaid</span>
+            <span className="p-3 bg-slate-900 rounded-xl border border-slate-800">Aetna Health</span>
+            <span className="p-3 bg-slate-900 rounded-xl border border-slate-800">Cigna Global</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer id="contact" className="border-t border-slate-800 bg-slate-950 py-12 text-slate-400 text-xs">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-left">
+          <div>
+            <div className="flex items-center space-x-2 text-white font-bold text-base mb-3">
+              <span className="text-cyan-400 text-xl">✚</span>
+              <span>HopeCare Hospital</span>
+            </div>
+            <p className="text-slate-400 leading-relaxed text-xs">
+              Providing modern, compassionate healthcare and 24/7 emergency response to our communities.
+            </p>
+          </div>
+          <div>
+            <h5 className="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Emergency Contacts</h5>
+            <p className="text-rose-400 font-bold">🚑 Ambulance: 911</p>
+            <p className="mt-1">Trauma Hotline: (800) 911-4673</p>
+            <p className="mt-1">Poison Control: (800) 222-1222</p>
+          </div>
+          <div>
+            <h5 className="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Hospital Campus</h5>
+            <p>742 Evergreen Medical Parkway</p>
+            <p className="mt-1">New York, NY 10021</p>
+            <p className="mt-1">Visiting Hours: 8:00 AM - 9:00 PM</p>
+          </div>
+          <div>
+            <h5 className="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Accreditations</h5>
+            <p>✓ Joint Commission Gold Seal</p>
+            <p className="mt-1">✓ Magnet Nursing Recognition</p>
+            <p className="mt-1">✓ AHA Stroke Gold Plus</p>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 pt-6 border-t border-slate-900 text-center text-slate-500">
+          © {new Date().getFullYear()} HopeCare Health System. All rights reserved. HIPAA Protected.
+        </div>
+      </footer>
+    </div>
+  );
+}
+`,
+      '/styles.css': `@tailwind base;
+@tailwind components;
+@tailwind utilities;
+`,
+      '/public/index.html': `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HopeCare Hospital & Medical Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-900">
+    <div id="root"></div>
+  </body>
+</html>
+`
+    }
+  };
 }
 
 function createSaaSTemplate(prompt) {

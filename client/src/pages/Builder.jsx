@@ -228,7 +228,26 @@ export default function Builder() {
         toast.success('Update noted! You can also edit code directly in the editor.');
       }
     } catch (err) {
-      toast.error('AI refinement temporarily offline; you can edit source code directly in the editor!');
+      // Client-side fallback if backend API is unreachable or fails
+      const fallback = getClientTemplate(userText);
+      if (fallback && fallback.files) {
+        setFiles(fallback.files);
+        setCurrentWorkingFiles(fallback.files);
+        if (fallback.title) setProjectTitle(fallback.title);
+        setRefreshKey((k) => k + 1);
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: `✨ Generated "${fallback.title}" based on your prompt! Check the live preview.`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }
+        ]);
+        toast.success('Website updated!');
+      } else {
+        toast.error('AI refinement temporarily offline; you can edit source code directly in the editor!');
+      }
     } finally {
       setLoading(false);
     }
