@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  color-scheme: dark;
+}
+
+code, pre {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090d16;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glow-effect {
+  position: relative;
+}
+.glow-effect::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(90deg, #8b5cf6, #ec4899, #3b82f6);
+  border-radius: inherit;
+  z-index: -1;
+  filter: blur(8px);
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+}
+.glow-effect:hover::before {
+  opacity: 0.8;
+}
+
+/* 
+ * Sandpack Full Viewport Height Overrides 
+ * Fixes: Blank space at bottom of split screen
+ */
+.sp-wrapper,
+.sp-layout,
+.sp-stack,
+.sp-pane {
+  height: 100% !important;
+  min-height: 100% !important;
+  flex: 1 !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+.sp-layout {
+  height: 100% !important;
+  min-height: 100% !important;
+  background: #020617 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  display: flex !important;
+}
+
+.sp-preview,
+.sp-preview-container,
+.sp-preview-iframe {
+  height: 100% !important;
+  min-height: 100% !important;
+  flex: 1 !important;
+  background-color: #020617 !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+.sp-code-editor {
+  height: 100% !important;
+  min-height: 100% !important;
+  flex: 1 !important;
+  background-color: #030712 !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+.cm-editor {
+  height: 100% !important;
+  background-color: #030712 !important;
+}
+
+.cm-scroller {
+  overflow: auto !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 13px !important;
+}
+
+.sp-tabs {
+  background-color: #0f172a !important;
+  border-bottom: 1px solid #1e293b !important;
+}

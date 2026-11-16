@@ -1,0 +1,28 @@
+{
+  "name": "ai-website-builder",
+  "version": "1.0.0",
+  "description": "Full Stack AI Website Builder SaaS (MERN Stack with Sandpack Live Preview & Free AI APIs)",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
+    "start": "node server/server.js"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "ai",
+    "website-builder",
+    "mern",
+    "react",
+    "sandpack",
+    "gemini",
+    "openrouter"
+  ],
+  "author": "",
+  "license": "MIT"
+}

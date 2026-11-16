@@ -1,0 +1,73 @@
+const express = require('express');
+const router = express.Router();
+const { generateWebsite, refineWebsite } = require('../services/aiService');
+const { optionalAuth } = require('../middleware/auth');
+
+// @route   POST /api/ai/generate
+// @desc    Generate website files from text prompt
+router.post('/generate', optionalAuth, async (req, res) => {
+  try {
+    const { prompt } = req.body;
+
+    if (!prompt || prompt.trim() === '') {
+      return res.status(400).json({ success: false, message: 'Please provide a prompt describing the website.' });
+    }
+
+    console.log(`✨ Generating website for prompt: "${prompt.substring(0, 80)}..."`);
+    const generatedData = await generateWebsite(prompt);
+
+    res.json({
+      success: true,
+      data: generatedData
+    });
+  } catch (error) {
+    console.error('AI Generation Route Error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to generate website code'
+    });
+  }
+});
+
+// @route   POST /api/ai/refine
+// @desc    Iteratively refine website code with follow-up prompt
+router.post('/refine', optionalAuth, async (req, res) => {
+  try {
+    const { prompt, currentFiles } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ success: false, message: 'Please provide an update instruction.' });
+    }
+
+    console.log(`🔄 Refining website: "${prompt.substring(0, 80)}..."`);
+    const refinedData = await refineWebsite({ prompt, currentFiles });
+
+    res.json({
+      success: true,
+      data: refinedData
+    });
+  } catch (error) {
+    console.error('AI Refinement Route Error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to refine website code'
+    });
+  }
+});
+
+// @route   GET /api/ai/status
+// @desc    Get current AI configuration & status
+router.get('/status', (req, res) => {
+  const gemini = !!process.env.GEMINI_API_KEY;
+  const openrouter = !!process.env.OPENROUTER_API_KEY;
+
+  res.json({
+    success: true,
+    provider: process.env.AI_PROVIDER || (gemini ? 'gemini' : openrouter ? 'openrouter' : 'smart-template-engine'),
+    hasGeminiKey: gemini,
+    hasOpenRouterKey: openrouter,
+    isOfflineReady: true
+  });
+});
+
+module.exports = router;
