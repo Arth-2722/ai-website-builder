@@ -7,7 +7,7 @@ const { connectDB } = require('./config/db');
 
 // Initialize express app
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Connect to MongoDB or local storage fallback
 connectDB();
@@ -57,10 +57,24 @@ app.use((err, req, res, next) => {
 });
 
 if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`🚀 AI Website Builder Server listening on port ${PORT}`);
-    console.log(`🌐 API Endpoint: http://localhost:${PORT}/api`);
-  });
+  const startServer = (portToTry) => {
+    const serverInstance = app.listen(portToTry, () => {
+      console.log(`🚀 AI Website Builder Server listening on port ${portToTry}`);
+      console.log(`🌐 API Endpoint: http://localhost:${portToTry}/api`);
+    });
+
+    serverInstance.on('error', (err) => {
+      if (err.code === 'EADDRINUSE' || err.code === 'EACCES') {
+        const nextPort = Number(portToTry) + 1;
+        console.warn(`⚠️ Port ${portToTry} is unavailable (${err.code}). Trying port ${nextPort}...`);
+        startServer(nextPort);
+      } else {
+        console.error('Server startup error:', err);
+      }
+    });
+  };
+
+  startServer(PORT);
 }
 
 module.exports = app;

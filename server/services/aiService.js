@@ -83,7 +83,7 @@ async function callOpenRouter(apiKey, prompt, systemInstruction = SYSTEM_PROMPT)
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': 'http://localhost:5000',
+      'HTTP-Referer': 'http://localhost:5001',
       'X-Title': 'AI Website Builder'
     },
     timeout: 60000
