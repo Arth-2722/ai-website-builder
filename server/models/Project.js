@@ -16,11 +16,10 @@ const projectSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
-    // files is a map of filename -> code content
-    // e.g. { "App.js": "...", "styles.css": "...", "index.html": "..." }
+    // files is a map/object of filename -> code content
+    // e.g. { "/App.js": "...", "/styles.css": "...", "/public/index.html": "..." }
     files: {
-      type: Map,
-      of: String,
+      type: mongoose.Schema.Types.Mixed,
       default: {}
     },
     templateType: {
