@@ -9,7 +9,7 @@ You must output a JSON object containing the files needed for an interactive Rea
 Guidelines for the code:
 1. The main entry must be "/App.js" which default exports a functional React component.
 2. Use Tailwind CSS classes for styling (Tailwind CDN is pre-loaded).
-3. The UI must be modern, responsive, visually appealing, with great typography, contrast, buttons, badges, and layout.
+3. The UI must be modern, responsive, visually appealing, with great typography, contrast, buttons, badges, and layout. If the user specifies an aesthetic theme (such as retro, vintage, 70s/80s, cyberpunk, neon, minimalist, or brutalist), strictly implement that complete visual aesthetic throughout typography (font-serif/mono), color scheme, pixel offset drop shadows (e.g. shadow-[4px_4px_0px_0px_#92400e]), chunky borders, badges, and thematic copywriting.
 4. Support interactive state (e.g., active tabs, mobile menu toggles, modal dialogs, calculators, form submissions, filter pills).
 5. Output ONLY valid JSON in the following format, with NO Markdown backticks around it:
 {
@@ -169,8 +169,10 @@ ${currentCode}
 USER MODIFICATION REQUEST:
 ${prompt}
 
-Apply the requested changes to the code while preserving existing features and structure.
-Return the complete updated project files in the exact same JSON format with keys: title, description, files.
+Instructions:
+1. Apply the user's requested modifications while preserving existing features and structure.
+2. If the user specifies an aesthetic theme (such as retro, vintage, 70s/80s, cyberpunk, neon, minimalist, or brutalist), completely restyle the UI components, typography, color palette, borders, pixel offset drop shadows, badges, and copywriting to match that aesthetic.
+3. Return the complete updated project files in the exact same JSON format with keys: title, description, files.
 `;
 
   try {
@@ -184,9 +186,24 @@ Return the complete updated project files in the exact same JSON format with key
       return await callOpenRouter(openrouterKey, refinementPrompt);
     }
 
-    // Fallback: Check if user is asking for a new category or redesign
+    // Fallback: Check if user is asking for a new category, redesign, or theme switch
     const lower = (prompt || '').toLowerCase();
+    const isThemeSwitch =
+      lower.includes('retro') ||
+      lower.includes('vintage') ||
+      lower.includes('70s') ||
+      lower.includes('80s') ||
+      lower.includes('90s') ||
+      lower.includes('cyberpunk') ||
+      lower.includes('neon') ||
+      lower.includes('minimal') ||
+      lower.includes('brutalist') ||
+      lower.includes('theme') ||
+      lower.includes('aesthetic') ||
+      lower.includes('style');
+
     const isRedesignPrompt =
+      isThemeSwitch ||
       lower.includes('hospital') ||
       lower.includes('clinic') ||
       lower.includes('medical') ||
@@ -206,8 +223,30 @@ Return the complete updated project files in the exact same JSON format with key
       lower.includes('redesign');
 
     if (isRedesignPrompt) {
-      console.log('🤖 Topic redesign prompt detected in chat! Generating full matching template...');
-      return generateTemplateFromPrompt(prompt);
+      console.log('🤖 Redesign or theme switch prompt detected in chat! Generating full matching template...');
+      let effectivePrompt = prompt;
+      if (isThemeSwitch && !lower.includes('hospital') && !lower.includes('restaurant') && !lower.includes('gym') && !lower.includes('car') && !lower.includes('law') && !lower.includes('shop')) {
+        const currentCodeStr = typeof currentFiles === 'object' ? JSON.stringify(currentFiles) : String(currentFiles);
+        const codeLower = currentCodeStr.toLowerCase();
+        let detectedIndustry = 'hospital';
+        if (codeLower.includes('cardiology') || codeLower.includes('patient') || codeLower.includes('hospital') || codeLower.includes('medical')) {
+          detectedIndustry = 'hospital';
+        } else if (codeLower.includes('pasta') || codeLower.includes('chef') || codeLower.includes('dining') || codeLower.includes('restaurant')) {
+          detectedIndustry = 'restaurant';
+        } else if (codeLower.includes('vehicle') || codeLower.includes('dealership') || codeLower.includes('auto') || codeLower.includes('motor')) {
+          detectedIndustry = 'car dealership';
+        } else if (codeLower.includes('gym') || codeLower.includes('workout') || codeLower.includes('fitness')) {
+          detectedIndustry = 'fitness gym';
+        } else if (codeLower.includes('attorney') || codeLower.includes('law') || codeLower.includes('litigation')) {
+          detectedIndustry = 'law firm';
+        } else if (codeLower.includes('property') || codeLower.includes('estate') || codeLower.includes('realtor')) {
+          detectedIndustry = 'real estate';
+        } else if (codeLower.includes('shop') || codeLower.includes('product') || codeLower.includes('store')) {
+          detectedIndustry = 'ecommerce store';
+        }
+        effectivePrompt = `${detectedIndustry} website ${prompt}`;
+      }
+      return generateTemplateFromPrompt(effectivePrompt);
     }
 
     // If existing App.js can be modified for colors or headings

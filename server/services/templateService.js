@@ -307,11 +307,49 @@ const INDUSTRY_PRESETS = [
   }
 ];
 
+function detectThemeModifier(pLower) {
+  if (
+    pLower.includes('retro') ||
+    pLower.includes('vintage') ||
+    pLower.includes('80s') ||
+    pLower.includes('70s') ||
+    pLower.includes('90s') ||
+    pLower.includes('nostalg') ||
+    pLower.includes('vaporwave') ||
+    pLower.includes('pixel') ||
+    pLower.includes('old school') ||
+    pLower.includes('classic')
+  ) {
+    return 'retro';
+  }
+  if (
+    pLower.includes('cyberpunk') ||
+    pLower.includes('neon') ||
+    pLower.includes('futur') ||
+    pLower.includes('scifi') ||
+    pLower.includes('sci-fi') ||
+    pLower.includes('matrix')
+  ) {
+    return 'cyberpunk';
+  }
+  if (
+    pLower.includes('minimal') ||
+    pLower.includes('brutal') ||
+    pLower.includes('mono') ||
+    pLower.includes('black and white') ||
+    pLower.includes('monochrome')
+  ) {
+    return 'minimalist';
+  }
+  return 'default';
+}
+
 // Universal fallback generator for ANY prompt in existence
 function generateTemplateFromPrompt(rawPrompt = '') {
   const prompt = rawPrompt.trim();
   const pLower = prompt.toLowerCase();
   const words = pLower.split(/[^a-z0-9]+/);
+  const themeModifier = detectThemeModifier(pLower);
 
   // Accurate word matching
   let matched = INDUSTRY_PRESETS.find(preset =>
@@ -323,7 +361,71 @@ function generateTemplateFromPrompt(rawPrompt = '') {
     matched = buildDynamicPreset(prompt);
   }
 
-  return assembleUniversalWebsite(prompt, matched);
+  // Clone preset so we don't mutate original
+  const presetClone = JSON.parse(JSON.stringify(matched));
+
+  // Apply theme modifications (retro, cyberpunk, minimalist)
+  if (themeModifier === 'retro') {
+    presetClone.isRetro = true;
+    presetClone.theme = {
+      primary: 'amber',
+      secondary: 'orange',
+      accent: 'yellow',
+      bg: 'stone-950',
+      badge: '📼 VINTAGE RETRO ARCHIVE • EST. 1978 • OLD-SCHOOL EXCELLENCE'
+    };
+
+    // If healthcare/hospital specifically
+    if (presetClone.category.includes('Healthcare') || presetClone.keys.includes('hospital') || pLower.includes('hospital') || pLower.includes('doctor') || pLower.includes('clinic')) {
+      presetClone.defaultName = 'St. Jude & Hope Memorial Hospital';
+      presetClone.tagline = 'Classic Vintage Care. Timeless Healing Heritage.';
+      presetClone.subtagline = 'Serving families with compassionate bedside medicine, dedicated analog laboratory diagnostics, and 24-hour emergency rotary dispatch since 1978.';
+      presetClone.cta = 'Patient Intake & Records';
+      presetClone.services = [
+        { icon: '❤️', title: 'Analog Cardiology & EKG Tracing', desc: 'Precision analog EKG rhythm tracing, cardiovascular auscultation, and restorative heart care.' },
+        { icon: '🧠', title: 'Neurological Examination', desc: 'Classic reflex assessment, cranial nerve diagnostic mapping, and comprehensive neurological counsel.' },
+        { icon: '👶', title: 'Family Practice & Pediatrics', desc: 'Attentive bedside family medicine, pediatric growth tracking, and preventative wellness examinations.' },
+        { icon: '🦴', title: 'Orthopedics & Bone Setting', desc: 'Traditional plaster casting, manual fracture reduction, and convalescent joint rehabilitation.' },
+        { icon: '💊', title: 'Apothecary & Dispensary', desc: 'Registered pharmacopeia dispensary, custom compounded formulations, and natural botanical elixirs.' },
+        { icon: '🚑', title: '24/7 Rotary Ambulance Dispatch', desc: 'Immediate municipal ambulance response, trauma field triage, and 24-hour analog emergency room.' }
+      ];
+      presetClone.teamTitle = 'Medical Faculty & Superintendents';
+      presetClone.team = [
+        { name: 'Dr. Arthur Vance, MD', role: 'Chief Medical Superintendent', detail: 'Harvard Medical Class of 1974 • 24 Yrs Exp', rating: '★★★★★ Official Register' },
+        { name: 'Dr. Eleanor Sterling, MD', role: 'Head of Pediatric Medicine', detail: 'Johns Hopkins Class of 1978 • 20 Yrs Exp', rating: '★★★★★ Official Register' },
+        { name: 'Dr. Walter Hayes, MD', role: 'Senior Trauma & Surgical Lead', detail: 'Mayo Clinic Class of 1972 • 26 Yrs Exp', rating: '★★★★★ Official Register' },
+        { name: 'Nurse Beatrice Higgins, RN', role: 'Head Ward Matron', detail: 'St. Mary’s School of Nursing 1976', rating: '★★★★★ Official Register' }
+      ];
+    } else {
+      presetClone.defaultName = `${presetClone.defaultName} (Retro 1978 Edition)`;
+      presetClone.tagline = `Classic Vintage Quality. Timeless Heritage.`;
+    }
+    return assembleRetroWebsite(prompt, presetClone);
+  } else if (themeModifier === 'cyberpunk') {
+    presetClone.isCyberpunk = true;
+    presetClone.defaultName = `CYBER-${presetClone.defaultName.toUpperCase()}`;
+    presetClone.tagline = `Next-Gen Neural Systems. Cyberpunk 2099.`;
+    presetClone.theme = {
+      primary: 'fuchsia',
+      secondary: 'cyan',
+      accent: 'pink',
+      bg: 'black',
+      badge: '⚡ CYBERPUNK 2099 // NEURAL AUGMENTATION PROTOCOL'
+    };
+    return assembleCyberpunkWebsite(prompt, presetClone);
+  } else if (themeModifier === 'minimalist') {
+    presetClone.isMinimalist = true;
+    presetClone.theme = {
+      primary: 'white',
+      secondary: 'slate',
+      accent: 'zinc',
+      bg: 'black',
+      badge: '■ MONOCHROME BRUTALIST ARCHITECTURE'
+    };
+    return assembleMinimalistWebsite(prompt, presetClone);
+  }
+
+  return assembleModernWebsite(prompt, presetClone);
 }
 
 function buildDynamicPreset(prompt) {
@@ -367,7 +469,7 @@ function buildDynamicPreset(prompt) {
   };
 }
 
-function assembleUniversalWebsite(prompt, preset) {
+function assembleModernWebsite(prompt, preset) {
   const { defaultName, tagline, subtagline, theme, cta, services, team, teamTitle } = preset;
   const primary = theme.primary; // e.g. cyan, amber, indigo, rose, emerald
 
@@ -380,8 +482,8 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
 
-  const services = ${JSON.stringify(services, null, 2)};
-  const team = ${JSON.stringify(team, null, 2)};
+  const services = \${JSON.stringify(services, null, 2)};
+  const team = \${JSON.stringify(team, null, 2)};
 
   const handleForm = (e) => {
     e.preventDefault();
@@ -389,40 +491,40 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-${theme.bg} text-slate-100 font-sans selection:bg-${primary}-500 selection:text-white">
+    <div className="min-h-screen bg-\${theme.bg} text-slate-100 font-sans selection:bg-\${primary}-500 selection:text-white">
       {/* Top Announcement Banner */}
-      <div className="bg-gradient-to-r from-${primary}-700 to-${theme.secondary}-700 text-white px-4 py-2 text-xs font-semibold">
+      <div className="bg-gradient-to-r from-\${primary}-700 to-\${theme.secondary}-700 text-white px-4 py-2 text-xs font-semibold">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <span>${theme.badge}</span>
+          <span>\${theme.badge}</span>
           <span className="hidden sm:inline font-mono">● Online & Accepting New Clients</span>
         </div>
       </div>
 
       {/* Main Navbar */}
-      <nav className="sticky top-0 z-40 backdrop-blur-xl bg-${theme.bg}/90 border-b border-slate-800">
+      <nav className="sticky top-0 z-40 backdrop-blur-xl bg-\${theme.bg}/90 border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-${primary}-500 to-${theme.secondary}-500 flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-${primary}-500/25">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-\${primary}-500 to-\${theme.secondary}-500 flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-\${primary}-500/25">
               ✦
             </div>
             <span className="font-extrabold text-xl tracking-tight text-white">
-              ${defaultName.split(' ')[0]} <span className="text-${primary}-400 font-light text-sm">${defaultName.split(' ').slice(1).join(' ')}</span>
+              \${defaultName.split(' ')[0]} <span className="text-\${primary}-400 font-light text-sm">\${defaultName.split(' ').slice(1).join(' ')}</span>
             </span>
           </div>
 
           <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
-            <a href="#services" className="hover:text-${primary}-400 transition-colors">Services</a>
-            <a href="#about" className="hover:text-${primary}-400 transition-colors">About Us</a>
-            <a href="#team" className="hover:text-${primary}-400 transition-colors">Our Team</a>
-            <a href="#contact" className="hover:text-${primary}-400 transition-colors">Contact</a>
+            <a href="#services" className="hover:text-\${primary}-400 transition-colors">Services</a>
+            <a href="#about" className="hover:text-\${primary}-400 transition-colors">About Us</a>
+            <a href="#team" className="hover:text-\${primary}-400 transition-colors">Our Team</a>
+            <a href="#contact" className="hover:text-\${primary}-400 transition-colors">Contact</a>
           </div>
 
           <div className="hidden sm:flex items-center space-x-4">
             <a
               href="#contact"
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-${primary}-500 to-${theme.secondary}-600 hover:from-${primary}-400 hover:to-${theme.secondary}-500 text-slate-950 font-bold text-xs shadow-lg shadow-${primary}-500/25 transition-all hover:scale-102"
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-\${primary}-500 to-\${theme.secondary}-600 hover:from-\${primary}-400 hover:to-\${theme.secondary}-500 text-slate-950 font-bold text-xs shadow-lg shadow-\${primary}-500/25 transition-all hover:scale-102"
             >
-              ${cta}
+              \${cta}
             </a>
           </div>
 
@@ -435,7 +537,7 @@ export default function App() {
           <div className="md:hidden px-4 py-4 bg-slate-950 border-b border-slate-800 space-y-2 text-sm">
             <a href="#services" className="block text-slate-300">Services</a>
             <a href="#team" className="block text-slate-300">Team</a>
-            <a href="#contact" className="block text-${primary}-400 font-semibold">${cta}</a>
+            <a href="#contact" className="block text-\${primary}-400 font-semibold">\${cta}</a>
           </div>
         )}
       </nav>
@@ -443,24 +545,24 @@ export default function App() {
       {/* Hero Section */}
       <section className="relative pt-20 pb-20 overflow-hidden text-center px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-${primary}-500/30 bg-${primary}-500/10 text-${primary}-300 text-xs font-semibold mb-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-\${primary}-500/30 bg-\${primary}-500/10 text-\${primary}-300 text-xs font-semibold mb-6">
             <span>⭐ Rated #1 in Quality & Customer Satisfaction</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight">
-            ${tagline}
+            \${tagline}
           </h1>
 
           <p className="mt-6 text-base sm:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            ${subtagline}
+            \${subtagline}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <a
               href="#contact"
-              className="px-7 py-3.5 rounded-xl bg-${primary}-500 hover:bg-${primary}-400 text-slate-950 font-bold text-sm shadow-xl shadow-${primary}-500/20 transition-all hover:scale-105"
+              className="px-7 py-3.5 rounded-xl bg-\${primary}-500 hover:bg-\${primary}-400 text-slate-950 font-bold text-sm shadow-xl shadow-\${primary}-500/20 transition-all hover:scale-105"
             >
-              ${cta}
+              \${cta}
             </a>
             <a
               href="#services"
@@ -473,7 +575,7 @@ export default function App() {
           {/* Quick Stats Grid */}
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
             <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-              <div className="text-3xl font-extrabold text-${primary}-400">99.8%</div>
+              <div className="text-3xl font-extrabold text-\${primary}-400">99.8%</div>
               <div className="text-xs text-slate-400 mt-1">Client Satisfaction</div>
             </div>
             <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
@@ -481,7 +583,7 @@ export default function App() {
               <div className="text-xs text-slate-400 mt-1">Happy Customers</div>
             </div>
             <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-              <div className="text-3xl font-extrabold text-${theme.secondary}-400">15+ Yrs</div>
+              <div className="text-3xl font-extrabold text-\${theme.secondary}-400">15+ Yrs</div>
               <div className="text-xs text-slate-400 mt-1">Proven Track Record</div>
             </div>
             <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
@@ -496,7 +598,7 @@ export default function App() {
       <section id="services" className="py-20 bg-slate-950/70 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-xs font-bold text-${primary}-400 uppercase tracking-widest">What We Offer</h2>
+            <h2 className="text-xs font-bold text-\${primary}-400 uppercase tracking-widest">What We Offer</h2>
             <p className="mt-3 text-3xl font-extrabold sm:text-4xl text-white">Full-Spectrum Capabilities</p>
             <p className="mt-3 text-slate-400 text-sm">Engineered with high standards, personalized attention, and modern technology.</p>
           </div>
@@ -505,18 +607,18 @@ export default function App() {
             {services.map((s, idx) => (
               <div
                 key={idx}
-                className="p-7 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-${primary}-500/50 transition-all hover:-translate-y-1 group"
+                className="p-7 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-\${primary}-500/50 transition-all hover:-translate-y-1 group"
               >
-                <div className="text-3xl mb-4 p-3 w-14 h-14 rounded-2xl bg-${primary}-500/10 border border-${primary}-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="text-3xl mb-4 p-3 w-14 h-14 rounded-2xl bg-\${primary}-500/10 border border-\${primary}-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                   {s.icon}
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-${primary}-300 transition-colors">
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-\${primary}-300 transition-colors">
                   {s.title}
                 </h3>
                 <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-4">
                   {s.desc}
                 </p>
-                <a href="#contact" className="text-${primary}-400 text-xs font-bold inline-flex items-center gap-1 hover:underline">
+                <a href="#contact" className="text-\${primary}-400 text-xs font-bold inline-flex items-center gap-1 hover:underline">
                   <span>Learn More</span> →
                 </a>
               </div>
@@ -529,18 +631,18 @@ export default function App() {
       <section id="team" className="py-20 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-xs font-bold text-${primary}-400 uppercase tracking-widest">${teamTitle}</h2>
+            <h2 className="text-xs font-bold text-\${primary}-400 uppercase tracking-widest">\${teamTitle}</h2>
             <p className="mt-3 text-3xl font-extrabold sm:text-4xl text-white">Meet Our Experts</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {team.map((m, idx) => (
-              <div key={idx} className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 text-center hover:border-${primary}-500/40 transition-all">
-                <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-${primary}-600 to-${theme.secondary}-600 flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
+              <div key={idx} className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 text-center hover:border-\${primary}-500/40 transition-all">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-\${primary}-600 to-\${theme.secondary}-600 flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
                   {m.name.charAt(0)}
                 </div>
                 <h4 className="font-bold text-white text-base">{m.name}</h4>
-                <p className="text-${primary}-400 text-xs font-medium mt-1">{m.role}</p>
+                <p className="text-\${primary}-400 text-xs font-medium mt-1">{m.role}</p>
                 <p className="text-slate-400 text-xs mt-2">{m.detail}</p>
                 <div className="text-amber-400 text-xs mt-2 font-mono">{m.rating}</div>
               </div>
@@ -578,7 +680,7 @@ export default function App() {
                       placeholder="e.g. John Doe"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-${primary}-500"
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-\${primary}-500"
                     />
                   </div>
                   <div>
@@ -589,7 +691,7 @@ export default function App() {
                       placeholder="contact@example.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-${primary}-500"
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-\${primary}-500"
                     />
                   </div>
                 </div>
@@ -601,13 +703,13 @@ export default function App() {
                     placeholder="Tell us about what you need..."
                     value={formData.note}
                     onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-${primary}-500"
+                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-\${primary}-500"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-${primary}-500 to-${theme.secondary}-600 hover:from-${primary}-400 hover:to-${theme.secondary}-500 text-slate-950 font-bold text-xs shadow-lg shadow-${primary}-500/25 transition-all"
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-\${primary}-500 to-\${theme.secondary}-600 hover:from-\${primary}-400 hover:to-\${theme.secondary}-500 text-slate-950 font-bold text-xs shadow-lg shadow-\${primary}-500/25 transition-all"
                 >
                   Submit Inquiry
                 </button>
@@ -621,7 +723,7 @@ export default function App() {
       <footer className="border-t border-slate-800 bg-slate-950 py-12 text-slate-400 text-xs text-center">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-white text-sm">${defaultName}</span>
+            <span className="font-bold text-white text-sm">\${defaultName}</span>
             <span>© {new Date().getFullYear()}. All rights reserved.</span>
           </div>
           <div className="flex space-x-6 text-slate-500">
@@ -647,10 +749,799 @@ export default function App() {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${defaultName}</title>
+    <title>\${defaultName}</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body class="bg-${theme.bg}">
+  <body class="bg-\${theme.bg}">
+    <div id="root"></div>
+  </body>
+</html>`
+    }
+  };
+}
+
+function assembleRetroWebsite(prompt, preset) {
+  const { defaultName, tagline, subtagline, theme, cta, services, team, teamTitle } = preset;
+
+  const appCode = `import React, { useState } from 'react';
+
+export default function App() {
+  const [formData, setFormData] = useState({ name: '', phone: '', department: 'General Care', note: '' });
+  const [submitted, setSubmitted] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const services = \${JSON.stringify(services, null, 2)};
+  const team = \${JSON.stringify(team, null, 2)};
+
+  const handleForm = (e) => {
+    e.preventDefault();
+    if (formData.name) setSubmitted(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-stone-950 text-amber-50 font-serif selection:bg-amber-500 selection:text-stone-950">
+      {/* 70s Striped Vintage Top Bar */}
+      <div className="bg-gradient-to-r from-amber-700 via-orange-600 to-yellow-600 text-stone-950 px-4 py-2 text-xs font-mono font-bold tracking-wider border-b-2 border-stone-900">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <span>\${theme.badge || '📼 VINTAGE RETRO ARCHIVE • EST. 1978'}</span>
+          </div>
+          <span className="hidden sm:inline bg-stone-950 text-amber-300 px-2 py-0.5 text-[11px] border border-amber-500/50">
+            ● ANALOG ARCHIVE ONLINE
+          </span>
+        </div>
+      </div>
+
+      {/* Retro Navbar */}
+      <nav className="sticky top-0 z-40 bg-stone-900/95 border-b-4 border-amber-600/80 shadow-[0_4px_0px_0px_#78350f]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-11 h-11 border-2 border-amber-400 bg-amber-500 text-stone-950 font-serif font-black flex items-center justify-center text-xl shadow-[3px_3px_0px_0px_#78350f]">
+              ✚
+            </div>
+            <div>
+              <span className="font-serif font-black text-xl tracking-tight text-amber-100 block sm:inline">
+                \${defaultName.split(' ')[0]}
+              </span>
+              <span className="font-mono text-xs uppercase tracking-widest text-amber-400 bg-amber-950/80 border border-amber-600/50 px-2 py-0.5 ml-0 sm:ml-2">
+                EST. 1978
+              </span>
+            </div>
+          </div>
+
+          <div className="hidden md:flex items-center space-x-8 text-xs font-mono uppercase tracking-wider text-amber-200/80">
+            <a href="#services" className="hover:text-amber-400 transition-colors">Departments</a>
+            <a href="#about" className="hover:text-amber-400 transition-colors">Heritage</a>
+            <a href="#team" className="hover:text-amber-400 transition-colors">Faculty</a>
+            <a href="#contact" className="hover:text-amber-400 transition-colors">Intake Desk</a>
+          </div>
+
+          <div className="hidden sm:flex items-center space-x-4">
+            <a
+              href="#contact"
+              className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-stone-950 font-mono font-black uppercase text-xs border-2 border-stone-900 shadow-[4px_4px_0px_0px_#92400e] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
+            >
+              \${cta || 'Patient Intake'}
+            </a>
+          </div>
+
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2 text-amber-400 hover:text-white font-mono text-lg">
+            ☰
+          </button>
+        </div>
+
+        {mobileMenuOpen && (
+          <div className="md:hidden px-4 py-4 bg-stone-900 border-b-2 border-amber-600 space-y-2 text-xs font-mono uppercase">
+            <a href="#services" className="block text-amber-200 py-1">Departments</a>
+            <a href="#team" className="block text-amber-200 py-1">Faculty</a>
+            <a href="#contact" className="block text-amber-400 font-bold py-1">\${cta || 'Patient Intake'}</a>
+          </div>
+        )}
+      </nav>
+
+      {/* Retro Hero Section */}
+      <section className="relative pt-16 pb-20 overflow-hidden text-center px-4 bg-gradient-to-b from-stone-900 via-stone-950 to-stone-950">
+        <div className="max-w-5xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 border-2 border-dashed border-amber-500/70 bg-amber-950/60 text-amber-300 font-mono text-xs uppercase tracking-widest mb-6 shadow-[2px_2px_0px_0px_#78350f]">
+            <span>📼 OFFICIAL RETRO ARCHIVE • EST. 1978</span>
+          </div>
+
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-black tracking-tight text-amber-100 leading-tight">
+            \${tagline}
+          </h1>
+
+          <p className="mt-6 text-sm sm:text-lg text-amber-200/80 max-w-2xl mx-auto leading-relaxed font-mono">
+            \${subtagline}
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="#contact"
+              className="px-7 py-3.5 bg-amber-400 hover:bg-amber-300 text-stone-950 font-mono font-black uppercase text-xs sm:text-sm border-2 border-stone-900 shadow-[5px_5px_0px_0px_#92400e] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
+            >
+              \${cta || 'Book Consultation'}
+            </a>
+            <a
+              href="#services"
+              className="px-7 py-3.5 bg-stone-900 hover:bg-stone-800 text-amber-200 font-mono text-xs sm:text-sm uppercase tracking-wider border-2 border-amber-600 shadow-[4px_4px_0px_0px_#78350f] transition-all"
+            >
+              Browse Registry
+            </a>
+          </div>
+
+          {/* Retro Analog Stats Gauges */}
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            <div className="p-5 bg-stone-900 border-2 border-amber-600/70 shadow-[4px_4px_0px_0px_#92400e] font-mono text-center">
+              <div className="text-3xl font-black text-amber-400 font-serif">48+ Yrs</div>
+              <div className="text-[11px] text-amber-200/70 mt-1 uppercase tracking-wider">Continuous Service</div>
+            </div>
+            <div className="p-5 bg-stone-900 border-2 border-amber-600/70 shadow-[4px_4px_0px_0px_#92400e] font-mono text-center">
+              <div className="text-3xl font-black text-amber-200 font-serif">100%</div>
+              <div className="text-[11px] text-amber-200/70 mt-1 uppercase tracking-wider">Analog Reliability</div>
+            </div>
+            <div className="p-5 bg-stone-900 border-2 border-amber-600/70 shadow-[4px_4px_0px_0px_#92400e] font-mono text-center">
+              <div className="text-3xl font-black text-orange-400 font-serif">35,000+</div>
+              <div className="text-[11px] text-amber-200/70 mt-1 uppercase tracking-wider">Patients Served</div>
+            </div>
+            <div className="p-5 bg-stone-900 border-2 border-amber-600/70 shadow-[4px_4px_0px_0px_#92400e] font-mono text-center">
+              <div className="text-3xl font-black text-amber-300 font-serif">24/7</div>
+              <div className="text-[11px] text-amber-200/70 mt-1 uppercase tracking-wider">Rotary Dispatch</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Retro Departments / Services */}
+      <section id="services" className="py-20 bg-stone-950 border-t-4 border-amber-700/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="px-3 py-1 bg-amber-950/80 border border-amber-600/60 text-amber-400 font-mono text-xs uppercase tracking-widest">
+              [ OFFICIAL ARCHIVE DOSSIER ]
+            </span>
+            <h2 className="mt-4 text-3xl font-serif font-black sm:text-5xl text-amber-100">
+              Featured Departments
+            </h2>
+            <p className="mt-3 text-amber-200/70 text-xs sm:text-sm font-mono">
+              Combining classic bedside empathy with time-honored discipline.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.map((s, idx) => (
+              <div
+                key={idx}
+                className="p-7 bg-stone-900 border-2 border-amber-600/70 shadow-[5px_5px_0px_0px_#92400e] hover:border-amber-400 hover:shadow-[6px_6px_0px_0px_#d97706] transition-all group"
+              >
+                <div className="text-3xl mb-4 p-3 w-14 h-14 border-2 border-amber-500 bg-amber-950/60 text-amber-300 flex items-center justify-center font-mono shadow-[2px_2px_0px_0px_#b45309]">
+                  {s.icon}
+                </div>
+                <div className="text-[10px] font-mono uppercase text-amber-400/80 tracking-widest mb-1">
+                  DOSSIER #1978-0{idx + 1}
+                </div>
+                <h3 className="text-xl font-serif font-bold text-amber-100 mb-2 group-hover:text-amber-300 transition-colors">
+                  {s.title}
+                </h3>
+                <p className="text-amber-200/75 text-xs sm:text-sm leading-relaxed mb-4 font-mono">
+                  {s.desc}
+                </p>
+                <a href="#contact" className="text-amber-400 text-xs font-mono font-bold uppercase inline-flex items-center gap-1 hover:underline">
+                  <span>File Inward Slip</span> →
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Retro Faculty Registry */}
+      <section id="team" className="py-20 bg-stone-900 border-t-4 border-amber-700/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="px-3 py-1 bg-amber-950/80 border border-amber-600/60 text-amber-400 font-mono text-xs uppercase tracking-widest">
+              [ OFFICIAL REGISTRY ]
+            </span>
+            <h2 className="mt-4 text-3xl font-serif font-black sm:text-5xl text-amber-100">
+              \${teamTitle || 'Distinguished Practitioners'}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {team.map((m, idx) => (
+              <div key={idx} className="p-6 bg-stone-950 border-2 border-amber-600/70 shadow-[4px_4px_0px_0px_#78350f] text-center">
+                <div className="w-16 h-16 mx-auto border-2 border-amber-400 bg-amber-900/60 text-amber-300 flex items-center justify-center font-serif text-2xl font-black mb-4 shadow-[2px_2px_0px_0px_#b45309]">
+                  {m.name.charAt(0)}
+                </div>
+                <h4 className="font-serif font-bold text-amber-100 text-base">{m.name}</h4>
+                <p className="text-amber-400 text-xs font-mono mt-1 uppercase tracking-wider">{m.role}</p>
+                <p className="text-amber-200/70 text-xs font-mono mt-2">{m.detail}</p>
+                <div className="mt-3 inline-block px-2 py-0.5 bg-amber-950 border border-amber-600/50 text-amber-400 text-[11px] font-mono">
+                  {m.rating}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Retro Physical Patient Intake / Admission Slip */}
+      <section id="contact" className="py-20 bg-stone-950 border-t-4 border-amber-700/80">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <span className="px-3 py-1 bg-amber-950/80 border border-amber-600/60 text-amber-400 font-mono text-xs uppercase tracking-widest">
+            [ INTAKE DESK ]
+          </span>
+          <h2 className="mt-4 text-3xl font-serif font-black text-amber-100 sm:text-4xl">Patient Admission & Inquiries</h2>
+          <p className="mt-2 text-amber-200/70 text-xs sm:text-sm font-mono">
+            Official intake slip. In emergency, call rotary hotline at (800) 911-1978.
+          </p>
+
+          <div className="mt-8 p-8 bg-stone-900 border-2 border-amber-600 shadow-[6px_6px_0px_0px_#92400e] text-left">
+            {submitted ? (
+              <div className="p-6 bg-stone-950 border-2 border-amber-500 text-amber-300 text-center font-mono">
+                <div className="text-3xl mb-2">📋</div>
+                <h4 className="font-serif font-bold text-xl text-amber-100">
+                  [ ✓ INTAKE SLIP FILED: #{Math.floor(1000 + Math.random() * 9000)} ]
+                </h4>
+                <p className="mt-2 text-xs text-amber-200/80">
+                  Thank you, {formData.name}. Your physical patient folder has been logged in the dispensary archive. Our attending supervisor will respond via rotary dispatch.
+                </p>
+                <button
+                  onClick={() => setSubmitted(false)}
+                  className="mt-5 px-5 py-2.5 bg-amber-400 text-stone-950 font-mono font-bold uppercase text-xs border border-stone-900 shadow-[2px_2px_0px_0px_#78350f]"
+                >
+                  File Another Slip
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForm} className="space-y-4">
+                <div className="border-b border-amber-600/40 pb-3 mb-4">
+                  <span className="font-mono text-[11px] text-amber-400 uppercase tracking-widest">
+                    FORM 1978-B // ADMISSION DOSSIER
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-mono uppercase text-amber-300 mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Johnathan Miller"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-stone-950 border-2 border-amber-700/60 text-xs text-amber-100 placeholder-amber-700/60 font-mono focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-mono uppercase text-amber-300 mb-1">Telephone Contact</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="(800) 555-1978"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-stone-950 border-2 border-amber-700/60 text-xs text-amber-100 placeholder-amber-700/60 font-mono focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono uppercase text-amber-300 mb-1">Department</label>
+                  <select
+                    value={formData.department}
+                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-stone-950 border-2 border-amber-700/60 text-xs text-amber-100 font-mono focus:outline-none focus:border-amber-400"
+                  >
+                    <option value="General Care">General Care & Recovery</option>
+                    <option value="Cardiology">Cardiology & Analog EKG</option>
+                    <option value="Pediatrics">Pediatrics & Family Care</option>
+                    <option value="Emergency">24-Hour Emergency Dispatch</option>
+                    <option value="Apothecary">Apothecary Dispensary</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono uppercase text-amber-300 mb-1">Clinical Notes or Inquiry</label>
+                  <textarea
+                    rows="3"
+                    placeholder="Describe symptoms or requirements..."
+                    value={formData.note}
+                    onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-stone-950 border-2 border-amber-700/60 text-xs text-amber-100 placeholder-amber-700/60 font-mono focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3.5 bg-amber-400 hover:bg-amber-300 text-stone-950 font-mono font-black uppercase text-xs sm:text-sm border-2 border-stone-900 shadow-[5px_5px_0px_0px_#92400e] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all"
+                >
+                  Submit Official Slip
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Retro Footer */}
+      <footer className="border-t-4 border-amber-700/80 bg-stone-950 py-12 text-amber-300/70 font-mono text-xs text-center">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-2">
+            <span className="font-bold text-amber-100 text-sm font-serif">\${defaultName}</span>
+            <span>© 1978–{new Date().getFullYear()}. All rights reserved.</span>
+          </div>
+          <div className="text-amber-400 font-mono">
+            ☎ Rotary Emergency Hotline: (800) 911-1978
+          </div>
+          <div className="flex space-x-6 text-amber-400/80">
+            <a href="#" className="hover:text-amber-200">Patient Rights</a>
+            <a href="#" className="hover:text-amber-200">Archives</a>
+            <a href="#" className="hover:text-amber-200">Municipal Code</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+`;
+
+  return {
+    title: defaultName,
+    description: tagline,
+    files: {
+      '/App.js': appCode,
+      '/styles.css': `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`,
+      '/public/index.html': `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>\${defaultName}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-stone-950">
+    <div id="root"></div>
+  </body>
+</html>`
+    }
+  };
+}
+
+function assembleCyberpunkWebsite(prompt, preset) {
+  const { defaultName, tagline, subtagline, theme, cta, services, team, teamTitle } = preset;
+
+  const appCode = `import React, { useState } from 'react';
+
+export default function App() {
+  const [formData, setFormData] = useState({ name: '', callsign: '', neuralNode: 'Alpha-01', query: '' });
+  const [submitted, setSubmitted] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const services = \${JSON.stringify(services, null, 2)};
+  const team = \${JSON.stringify(team, null, 2)};
+
+  const handleForm = (e) => {
+    e.preventDefault();
+    if (formData.name) setSubmitted(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-cyan-100 font-mono selection:bg-fuchsia-500 selection:text-black">
+      {/* Cyber Top Scanline Banner */}
+      <div className="bg-gradient-to-r from-fuchsia-600 via-purple-600 to-cyan-500 text-black px-4 py-1.5 text-xs font-black tracking-widest border-b border-fuchsia-400">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <span>// PROTOCOL 2099 // NEURAL OVERDRIVE ONLINE</span>
+          <span className="hidden sm:inline">● SYS_STATUS: OPERATIONAL [PING: 4MS]</span>
+        </div>
+      </div>
+
+      {/* Cyber Navbar */}
+      <nav className="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b-2 border-fuchsia-500/80 shadow-[0_0_15px_rgba(217,70,239,0.35)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 border border-cyan-400 bg-cyan-950/80 text-cyan-300 font-bold flex items-center justify-center text-lg shadow-[0_0_10px_rgba(6,182,212,0.5)]">
+              ⚡
+            </div>
+            <span className="font-black text-lg tracking-widest text-white">
+              \${defaultName} <span className="text-fuchsia-400 text-xs">[2099.V2]</span>
+            </span>
+          </div>
+
+          <div className="hidden md:flex items-center space-x-8 text-xs tracking-wider text-cyan-300">
+            <a href="#services" className="hover:text-fuchsia-400 transition-colors">// MODULES</a>
+            <a href="#team" className="hover:text-fuchsia-400 transition-colors">// OPERATORS</a>
+            <a href="#contact" className="hover:text-fuchsia-400 transition-colors">// TRANSMIT</a>
+          </div>
+
+          <div className="hidden sm:flex items-center space-x-4">
+            <a
+              href="#contact"
+              className="px-5 py-2 bg-fuchsia-600 hover:bg-fuchsia-500 text-black font-black uppercase text-xs tracking-wider border border-fuchsia-300 shadow-[0_0_15px_rgba(217,70,239,0.6)] hover:shadow-[0_0_25px_rgba(217,70,239,0.9)] transition-all"
+            >
+              \${cta || 'INITIATE PROTOCOL'}
+            </a>
+          </div>
+
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2 text-cyan-400 hover:text-white">
+            [MENU]
+          </button>
+        </div>
+
+        {mobileMenuOpen && (
+          <div className="md:hidden px-4 py-4 bg-zinc-950 border-b border-fuchsia-500 space-y-2 text-xs">
+            <a href="#services" className="block text-cyan-300">// MODULES</a>
+            <a href="#team" className="block text-cyan-300">// OPERATORS</a>
+            <a href="#contact" className="block text-fuchsia-400 font-bold">\${cta || 'INITIATE'}</a>
+          </div>
+        )}
+      </nav>
+
+      {/* Cyber Hero */}
+      <section className="relative pt-20 pb-20 overflow-hidden text-center px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-1 border border-cyan-400/60 bg-cyan-950/40 text-cyan-300 text-xs tracking-widest mb-6 shadow-[0_0_10px_rgba(6,182,212,0.4)]">
+            <span>⚡ NEURAL AUGMENTATION PROTOCOL READY</span>
+          </div>
+
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-tight">
+            \${tagline}
+          </h1>
+
+          <p className="mt-6 text-sm sm:text-lg text-cyan-300/80 max-w-2xl mx-auto leading-relaxed">
+            \${subtagline}
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="#contact"
+              className="px-7 py-3.5 bg-fuchsia-600 hover:bg-fuchsia-500 text-black font-black uppercase text-xs sm:text-sm border border-fuchsia-300 shadow-[0_0_20px_rgba(217,70,239,0.7)] transition-all"
+            >
+              \${cta || 'ACTIVATE UPLINK'}
+            </a>
+            <a
+              href="#services"
+              className="px-7 py-3.5 bg-black hover:bg-zinc-900 text-cyan-300 font-bold text-xs sm:text-sm uppercase border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all"
+            >
+              EXPLORE SCHEMATICS
+            </a>
+          </div>
+
+          {/* Cyber Gauges */}
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            <div className="p-5 bg-black border border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.2)] text-center">
+              <div className="text-3xl font-black text-cyan-400">99.9%</div>
+              <div className="text-[10px] text-cyan-300/70 mt-1 uppercase tracking-widest">SYNAPSE SYNC</div>
+            </div>
+            <div className="p-5 bg-black border border-fuchsia-500/40 shadow-[0_0_15px_rgba(217,70,239,0.2)] text-center">
+              <div className="text-3xl font-black text-fuchsia-400">50K+</div>
+              <div className="text-[10px] text-fuchsia-300/70 mt-1 uppercase tracking-widest">NEURAL NODES</div>
+            </div>
+            <div className="p-5 bg-black border border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.2)] text-center">
+              <div className="text-3xl font-black text-cyan-300">0.02ms</div>
+              <div className="text-[10px] text-cyan-300/70 mt-1 uppercase tracking-widest">LATENCY</div>
+            </div>
+            <div className="p-5 bg-black border border-fuchsia-500/40 shadow-[0_0_15px_rgba(217,70,239,0.2)] text-center">
+              <div className="text-3xl font-black text-fuchsia-300">24/7</div>
+              <div className="text-[10px] text-fuchsia-300/70 mt-1 uppercase tracking-widest">CYBER UPTIME</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Cyber Services */}
+      <section id="services" className="py-20 bg-zinc-950 border-t border-cyan-500/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-xs font-black text-fuchsia-400 uppercase tracking-widest">// SYSTEM PROTOCOLS</h2>
+            <p className="mt-3 text-3xl font-black sm:text-5xl text-white">Active Capabilities</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.map((s, idx) => (
+              <div
+                key={idx}
+                className="p-7 bg-black border border-cyan-500/40 hover:border-fuchsia-500 shadow-[0_0_15px_rgba(6,182,212,0.15)] hover:shadow-[0_0_25px_rgba(217,70,239,0.3)] transition-all group"
+              >
+                <div className="text-3xl mb-4 p-3 w-14 h-14 border border-cyan-400 bg-cyan-950/40 text-cyan-300 flex items-center justify-center">
+                  {s.icon}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">
+                  {s.title}
+                </h3>
+                <p className="text-cyan-200/70 text-xs sm:text-sm leading-relaxed mb-4">
+                  {s.desc}
+                </p>
+                <a href="#contact" className="text-fuchsia-400 text-xs font-bold uppercase inline-flex items-center gap-1 hover:underline">
+                  <span>DEPLOY NODE</span> →
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Cyber Operators */}
+      <section id="team" className="py-20 bg-black border-t border-fuchsia-500/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-xs font-black text-cyan-400 uppercase tracking-widest">// ARCHITECTS</h2>
+            <p className="mt-3 text-3xl font-black sm:text-5xl text-white">\${teamTitle || 'System Operators'}</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {team.map((m, idx) => (
+              <div key={idx} className="p-6 bg-zinc-950 border border-fuchsia-500/40 text-center hover:border-cyan-400 transition-all">
+                <div className="w-16 h-16 mx-auto border border-fuchsia-400 bg-fuchsia-950/60 text-fuchsia-300 flex items-center justify-center text-2xl font-bold mb-4 shadow-[0_0_10px_rgba(217,70,239,0.4)]">
+                  {m.name.charAt(0)}
+                </div>
+                <h4 className="font-bold text-white text-base">{m.name}</h4>
+                <p className="text-cyan-400 text-xs mt-1">{m.role}</p>
+                <p className="text-zinc-400 text-xs mt-2">{m.detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Cyber Uplink Form */}
+      <section id="contact" className="py-20 bg-zinc-950 border-t border-cyan-500/30">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-black text-white sm:text-4xl">// TRANSMIT ENCRYPTED QUERY</h2>
+          <p className="mt-2 text-cyan-300/70 text-xs sm:text-sm">Direct uplink channel. End-to-end quantum encrypted.</p>
+
+          <div className="mt-8 p-8 bg-black border-2 border-fuchsia-500 shadow-[0_0_25px_rgba(217,70,239,0.3)] text-left">
+            {submitted ? (
+              <div className="p-6 bg-cyan-950/50 border border-cyan-400 text-cyan-300 text-center">
+                <div className="text-3xl mb-2">⚡</div>
+                <h4 className="font-bold text-xl text-white">[ TRANSMISSION BROADCAST SUCCESSFUL ]</h4>
+                <p className="mt-2 text-xs">
+                  Signal received for user: {formData.name}. Node route logged. Standby for quantum decryption response.
+                </p>
+                <button
+                  onClick={() => setSubmitted(false)}
+                  className="mt-4 px-4 py-2 bg-fuchsia-600 text-black font-bold text-xs uppercase"
+                >
+                  SEND NEW TRANSMISSION
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForm} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs uppercase text-cyan-300 mb-1">// IDENTITY NAME</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Neo Vance"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-zinc-950 border border-cyan-500/60 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase text-cyan-300 mb-1">// COMM CALLSIGN / COMMS</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="neo@matrix.io"
+                      value={formData.callsign}
+                      onChange={(e) => setFormData({ ...formData, callsign: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-zinc-950 border border-cyan-500/60 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase text-cyan-300 mb-1">// PAYLOAD DATA</label>
+                  <textarea
+                    rows="3"
+                    placeholder="Enter encrypted instructions or system query..."
+                    value={formData.query}
+                    onChange={(e) => setFormData({ ...formData, query: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-zinc-950 border border-cyan-500/60 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3.5 bg-fuchsia-600 hover:bg-fuchsia-500 text-black font-black uppercase text-xs border border-fuchsia-300 shadow-[0_0_20px_rgba(217,70,239,0.7)] transition-all"
+                >
+                  BROADCAST SIGNAL
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Cyber Footer */}
+      <footer className="border-t border-cyan-500/30 bg-black py-12 text-zinc-500 text-xs text-center">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-2">
+            <span className="font-bold text-white text-sm">\${defaultName}</span>
+            <span>// YEAR 2099 CYBER PROTOCOL.</span>
+          </div>
+          <div className="flex space-x-6 text-cyan-400">
+            <a href="#" className="hover:text-white">// SECURITY</a>
+            <a href="#" className="hover:text-white">// PROTOCOL</a>
+            <a href="#" className="hover:text-white">// TERMINAL</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+`;
+
+  return {
+    title: defaultName,
+    description: tagline,
+    files: {
+      '/App.js': appCode,
+      '/styles.css': `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`,
+      '/public/index.html': `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>\${defaultName}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-black">
+    <div id="root"></div>
+  </body>
+</html>`
+    }
+  };
+}
+
+function assembleMinimalistWebsite(prompt, preset) {
+  const { defaultName, tagline, subtagline, theme, cta, services, team, teamTitle } = preset;
+
+  const appCode = `import React, { useState } from 'react';
+
+export default function App() {
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [submitted, setSubmitted] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const services = \${JSON.stringify(services, null, 2)};
+  const team = \${JSON.stringify(team, null, 2)};
+
+  const handleForm = (e) => {
+    e.preventDefault();
+    if (formData.name) setSubmitted(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-white font-mono selection:bg-white selection:text-black">
+      {/* Brutalist Top Bar */}
+      <div className="bg-white text-black px-4 py-2 text-xs font-bold uppercase tracking-widest border-b-2 border-white">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <span>■ MONOCHROME ARCHITECTURE 01</span>
+          <span>EST. MMXXVI</span>
+        </div>
+      </div>
+
+      {/* Brutalist Navbar */}
+      <nav className="sticky top-0 z-40 bg-black border-b-2 border-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+          <span className="font-bold text-lg uppercase tracking-widest">
+            ■ \${defaultName}
+          </span>
+
+          <div className="hidden md:flex items-center space-x-8 text-xs font-bold uppercase tracking-widest">
+            <a href="#services" className="hover:text-zinc-400">/ Capabilities</a>
+            <a href="#team" className="hover:text-zinc-400">/ Directors</a>
+            <a href="#contact" className="hover:text-zinc-400">/ Inquire</a>
+          </div>
+
+          <a
+            href="#contact"
+            className="px-5 py-2.5 bg-white text-black font-bold uppercase text-xs border-2 border-white hover:bg-black hover:text-white transition-all"
+          >
+            \${cta || 'Connect'}
+          </a>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section className="py-24 px-4 text-left max-w-7xl mx-auto border-b-2 border-white">
+        <h1 className="text-4xl sm:text-7xl font-bold uppercase tracking-tight leading-none">
+          \${tagline}
+        </h1>
+        <p className="mt-8 text-base sm:text-xl text-zinc-400 max-w-3xl leading-relaxed">
+          \${subtagline}
+        </p>
+        <div className="mt-10 flex gap-4">
+          <a href="#contact" className="px-8 py-4 bg-white text-black font-bold uppercase text-xs border-2 border-white hover:bg-black hover:text-white transition-all">
+            \${cta || 'Initiate Contact'}
+          </a>
+        </div>
+      </section>
+
+      {/* Capabilities */}
+      <section id="services" className="py-20 border-b-2 border-white max-w-7xl mx-auto px-4">
+        <h2 className="text-xs uppercase tracking-widest text-zinc-500 mb-8">■ Capabilities Overview</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.map((s, idx) => (
+            <div key={idx} className="p-6 border-2 border-white hover:bg-zinc-950 transition-colors">
+              <div className="text-2xl mb-4">{s.icon}</div>
+              <h3 className="text-lg font-bold uppercase mb-2">{s.title}</h3>
+              <p className="text-xs text-zinc-400 leading-relaxed">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section id="contact" className="py-20 max-w-3xl mx-auto px-4">
+        <h2 className="text-2xl font-bold uppercase mb-4">■ Inquire</h2>
+        {submitted ? (
+          <div className="p-6 border-2 border-white text-center">
+            <h4 className="font-bold uppercase">Record Received.</h4>
+            <p className="text-xs text-zinc-400 mt-2">Our partners will respond via dispatched memo.</p>
+          </div>
+        ) : (
+          <form onSubmit={handleForm} className="space-y-4">
+            <div>
+              <label className="block text-xs uppercase mb-1">Your Name</label>
+              <input
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-3.5 py-3 bg-black border-2 border-white text-xs text-white focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs uppercase mb-1">Contact Email</label>
+              <input
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full px-3.5 py-3 bg-black border-2 border-white text-xs text-white focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs uppercase mb-1">Specification</label>
+              <textarea
+                rows="3"
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                className="w-full px-3.5 py-3 bg-black border-2 border-white text-xs text-white focus:outline-none"
+              />
+            </div>
+            <button type="submit" className="w-full py-4 bg-white text-black font-bold uppercase text-xs border-2 border-white hover:bg-black hover:text-white transition-all">
+              Submit Specification
+            </button>
+          </form>
+        )}
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t-2 border-white py-8 text-center text-xs text-zinc-500 uppercase">
+        \${defaultName} — All Rights Reserved.
+      </footer>
+    </div>
+  );
+}
+`;
+
+  return {
+    title: defaultName,
+    description: tagline,
+    files: {
+      '/App.js': appCode,
+      '/styles.css': `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`,
+      '/public/index.html': `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>\${defaultName}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-black">
     <div id="root"></div>
   </body>
 </html>`
