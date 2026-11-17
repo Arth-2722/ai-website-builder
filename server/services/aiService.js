@@ -23,42 +23,69 @@ Guidelines for the code:
 }
 `;
 
+const GEMINI_MODELS = [
+  'gemini-flash-latest',
+  'gemini-flash-lite-latest',
+  'gemini-3.8-flash',
+  'gemini-3.5-flash-lite',
+  'gemini-3.5-flash'
+];
+
 /**
- * Call Google Gemini Free Tier API
+ * Call Google Gemini Free Tier API with resilient multi-model fallback
  */
 async function callGemini(apiKey, prompt, systemInstruction = SYSTEM_PROMPT) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  let lastError = null;
 
-  const payload = {
-    contents: [
-      {
-        role: 'user',
-        parts: [
+  for (const model of GEMINI_MODELS) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+      const payload = {
+        contents: [
           {
-            text: `${systemInstruction}\n\nUSER PROMPT: ${prompt}\n\nReturn strictly valid JSON only.`
+            role: 'user',
+            parts: [
+              {
+                text: `${systemInstruction}\n\nUSER PROMPT: ${prompt}\n\nReturn strictly valid JSON only.`
+              }
+            ]
           }
-        ]
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 8192,
+          responseMimeType: 'application/json'
+        }
+      };
+
+      const response = await axios.post(url, payload, {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 60000
+      });
+
+      const candidate = response.data?.candidates?.[0];
+      const text = candidate?.content?.parts?.[0]?.text;
+      if (!text) {
+        throw new Error(`Gemini (${model}) returned an empty response`);
       }
-    ],
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 8192,
-      responseMimeType: 'application/json'
+
+      console.log(`✓ Gemini model "${model}" generated content successfully!`);
+      return cleanAndParseJSON(text);
+    } catch (err) {
+      lastError = err;
+      const status = err.response?.status;
+      const msg = err.response?.data?.error?.message || err.message;
+      console.warn(`⚠️ Gemini model "${model}" notice (${status}): ${msg}. Trying next fallback model...`);
+
+      // If invalid API key (400), don't retry other models
+      if (status === 400 && msg.includes('API key not valid')) {
+        throw err;
+      }
     }
-  };
-
-  const response = await axios.post(url, payload, {
-    headers: { 'Content-Type': 'application/json' },
-    timeout: 60000
-  });
-
-  const candidate = response.data?.candidates?.[0];
-  const text = candidate?.content?.parts?.[0]?.text;
-  if (!text) {
-    throw new Error('Gemini API returned an empty response');
   }
 
-  return cleanAndParseJSON(text);
+  throw lastError || new Error('All Gemini model endpoints failed');
 }
 
 /**
@@ -97,6 +124,52 @@ async function callOpenRouter(apiKey, prompt, systemInstruction = SYSTEM_PROMPT)
   return cleanAndParseJSON(content);
 }
 
+function normalizeProjectJSON(parsed) {
+  if (!parsed || typeof parsed !== 'object') {
+    throw new Error('AI output is not a valid object');
+  }
+
+  const normalized = {
+    title: parsed.title || 'AI Generated Website',
+    description: parsed.description || 'Generated with AI Website Builder',
+    files: {}
+  };
+
+  const rawFiles = parsed.files || {};
+  Object.entries(rawFiles).forEach(([key, val]) => {
+    const normalizedKey = key.startsWith('/') ? key : `/${key}`;
+    normalized.files[normalizedKey] = typeof val === 'string' ? val : (val?.code || String(val || ''));
+  });
+
+  // Ensure /App.js exists
+  if (!normalized.files['/App.js'] && normalized.files['/App.jsx']) {
+    normalized.files['/App.js'] = normalized.files['/App.jsx'];
+  }
+
+  // Ensure /styles.css exists
+  if (!normalized.files['/styles.css']) {
+    normalized.files['/styles.css'] = `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`;
+  }
+
+  // Ensure /public/index.html exists
+  if (!normalized.files['/public/index.html']) {
+    normalized.files['/public/index.html'] = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${normalized.title}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-950">
+    <div id="root"></div>
+  </body>
+</html>`;
+  }
+
+  return normalized;
+}
+
 /**
  * Safe JSON cleanup and parser
  */
@@ -110,18 +183,22 @@ function cleanAndParseJSON(rawText) {
   }
   cleaned = cleaned.trim();
 
+  let parsed = null;
   try {
-    return JSON.parse(cleaned);
+    parsed = JSON.parse(cleaned);
   } catch (err) {
     // Attempt to locate first { and last }
     const firstBrace = cleaned.indexOf('{');
     const lastBrace = cleaned.lastIndexOf('}');
     if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
       const extracted = cleaned.substring(firstBrace, lastBrace + 1);
-      return JSON.parse(extracted);
+      parsed = JSON.parse(extracted);
+    } else {
+      throw new Error(`Failed to parse AI output as JSON: ${err.message}`);
     }
-    throw new Error(`Failed to parse AI output as JSON: ${err.message}`);
   }
+
+  return normalizeProjectJSON(parsed);
 }
 
 /**
