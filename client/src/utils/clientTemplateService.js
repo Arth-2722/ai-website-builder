@@ -480,18 +480,24 @@ function buildDynamicPreset(prompt) {
 function assembleModernWebsite(prompt, preset) {
   const { defaultName, tagline, subtagline, theme, cta, services, team, teamTitle } = preset;
   const primary = theme.primary; // e.g. cyan, amber, indigo, rose, emerald
+  const secondary = theme.secondary || 'blue';
 
   const appCode = `import React, { useState } from 'react';
 
 export default function App() {
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', note: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', department: 'Primary Consultation', note: '' });
   const [submitted, setSubmitted] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
 
   const services = ${JSON.stringify(services, null, 2)};
   const team = ${JSON.stringify(team, null, 2)};
+
+  const testimonials = [
+    { name: 'Elena Vance', role: 'Verified Client', comment: 'The level of care and personalized attention was extraordinary. Truly unmatched precision.', rating: 5, avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop' },
+    { name: 'Marcus Sterling', role: 'Enterprise Executive', comment: 'World-class standards and state-of-the-art facilities. Exceeded all our expectations.', rating: 5, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop' },
+    { name: 'Dr. Priya Sharma', role: 'Medical Specialist', comment: 'Their outcomes and technological rigor speak for themselves. The gold standard in the field.', rating: 5, avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop' }
+  ];
 
   const handleForm = (e) => {
     e.preventDefault();
@@ -499,125 +505,285 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-${theme.bg} text-slate-100 font-sans selection:bg-${primary}-500 selection:text-white">
-      {/* Top Announcement Banner */}
-      <div className="bg-gradient-to-r from-${primary}-700 to-${theme.secondary}-700 text-white px-4 py-2 text-xs font-semibold">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-${primary}-500 selection:text-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(14,165,233,0.15),rgba(255,255,255,0))]">
+      {/* Top Notification Bar */}
+      <div className="bg-gradient-to-r from-${primary}-950 via-slate-900 to-${secondary}-950 border-b border-white/10 text-white px-4 py-2 text-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <span>${theme.badge}</span>
-          <span className="hidden sm:inline font-mono">● Online & Accepting New Clients</span>
+          <div className="flex items-center space-x-2">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="font-medium text-slate-200">${theme.badge}</span>
+          </div>
+          <div className="hidden sm:flex items-center space-x-4 text-[11px] text-slate-400 font-mono">
+            <span>● AVERAGE RESPONSE: &lt; 5 MINS</span>
+            <span className="text-emerald-400">● 100% ONLINE & DISPATCH READY</span>
+          </div>
         </div>
       </div>
 
-      {/* Main Navbar */}
-      <nav className="sticky top-0 z-40 backdrop-blur-xl bg-${theme.bg}/90 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+      {/* Glassmorphic Navbar */}
+      <nav className="sticky top-0 z-40 backdrop-blur-xl bg-slate-950/80 border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-${primary}-500 to-${theme.secondary}-500 flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-${primary}-500/25">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-${primary}-500 to-${secondary}-600 flex items-center justify-center font-extrabold text-white text-xl shadow-lg shadow-${primary}-500/25 border border-white/20">
               ✦
             </div>
-            <span className="font-extrabold text-xl tracking-tight text-white">
-              ${defaultName.split(' ')[0]} <span className="text-${primary}-400 font-light text-sm">${defaultName.split(' ').slice(1).join(' ')}</span>
-            </span>
+            <div>
+              <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white block">
+                ${defaultName.split(' ')[0]}
+              </span>
+              <span className="text-[11px] font-semibold text-${primary}-400 tracking-wider uppercase">
+                ${defaultName.split(' ').slice(1, 3).join(' ')}
+              </span>
+            </div>
           </div>
 
-          <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-300">
-            <a href="#services" className="hover:text-${primary}-400 transition-colors">Services</a>
-            <a href="#about" className="hover:text-${primary}-400 transition-colors">About Us</a>
-            <a href="#team" className="hover:text-${primary}-400 transition-colors">Our Team</a>
-            <a href="#contact" className="hover:text-${primary}-400 transition-colors">Contact</a>
+          <div className="hidden md:flex items-center space-x-8 text-xs font-semibold uppercase tracking-wider text-slate-300">
+            <a href="#services" className="hover:text-${primary}-400 transition-colors">Specialties</a>
+            <a href="#bento" className="hover:text-${primary}-400 transition-colors">Infrastructure</a>
+            <a href="#team" className="hover:text-${primary}-400 transition-colors">Specialists</a>
+            <a href="#reviews" className="hover:text-${primary}-400 transition-colors">Reviews</a>
+            <a href="#consultation" className="hover:text-${primary}-400 transition-colors">Inquiry</a>
           </div>
 
           <div className="hidden sm:flex items-center space-x-4">
             <a
-              href="#contact"
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-${primary}-500 to-${theme.secondary}-600 hover:from-${primary}-400 hover:to-${theme.secondary}-500 text-slate-950 font-bold text-xs shadow-lg shadow-${primary}-500/25 transition-all hover:scale-102"
+              href="#consultation"
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-${primary}-500 to-${secondary}-600 hover:from-${primary}-400 hover:to-${secondary}-500 text-slate-950 font-bold text-xs shadow-lg shadow-${primary}-500/30 transition-all hover:scale-105"
             >
               ${cta}
             </a>
           </div>
 
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2 text-slate-400 hover:text-white">
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2 text-slate-400 hover:text-white text-xl">
             ☰
           </button>
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden px-4 py-4 bg-slate-950 border-b border-slate-800 space-y-2 text-sm">
-            <a href="#services" className="block text-slate-300">Services</a>
-            <a href="#team" className="block text-slate-300">Team</a>
-            <a href="#contact" className="block text-${primary}-400 font-semibold">${cta}</a>
+          <div className="md:hidden px-4 py-4 bg-slate-900 border-b border-white/10 space-y-3 text-xs uppercase font-semibold">
+            <a href="#services" className="block text-slate-200">Specialties</a>
+            <a href="#bento" className="block text-slate-200">Infrastructure</a>
+            <a href="#team" className="block text-slate-200">Specialists</a>
+            <a href="#consultation" className="block text-${primary}-400 font-bold">${cta}</a>
           </div>
         )}
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative pt-20 pb-20 overflow-hidden text-center px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-${primary}-500/30 bg-${primary}-500/10 text-${primary}-300 text-xs font-semibold mb-6">
-            <span>⭐ Rated #1 in Quality & Customer Satisfaction</span>
+      {/* Hero Section with Split Layout & Live Interactive Console */}
+      <section className="relative pt-16 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Left Column: Value Proposition & High-Trust Proof */}
+          <div className="lg:col-span-7 text-left space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-${primary}-500/30 bg-${primary}-500/10 text-${primary}-300 text-xs font-semibold">
+              <span className="flex h-2 w-2 rounded-full bg-${primary}-400 animate-pulse"></span>
+              <span>Accredited Diamond Excellence Provider 2026</span>
+            </div>
+
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight">
+              ${tagline.split('.')[0]}. <br />
+              <span className="bg-gradient-to-r from-${primary}-400 via-teal-300 to-${secondary}-400 bg-clip-text text-transparent">
+                ${tagline.split('.')[1] || 'Engineered For Tomorrow.'}
+              </span>
+            </h1>
+
+            <p className="text-base sm:text-lg text-slate-300 max-w-xl leading-relaxed">
+              ${subtagline}
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <a
+                href="#consultation"
+                className="px-7 py-3.5 rounded-2xl bg-${primary}-500 hover:bg-${primary}-400 text-slate-950 font-bold text-sm shadow-xl shadow-${primary}-500/25 transition-all hover:scale-105"
+              >
+                ${cta}
+              </a>
+              <a
+                href="#services"
+                className="px-7 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-white font-semibold text-sm border border-white/10 transition-all"
+              >
+                Explore Capabilities
+              </a>
+            </div>
+
+            {/* Social Proof Avatar Stack */}
+            <div className="pt-6 border-t border-slate-800/80 flex items-center space-x-4">
+              <div className="flex -space-x-3">
+                <img className="w-10 h-10 rounded-full border-2 border-slate-950 object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop" alt="avatar" />
+                <img className="w-10 h-10 rounded-full border-2 border-slate-950 object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop" alt="avatar" />
+                <img className="w-10 h-10 rounded-full border-2 border-slate-950 object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop" alt="avatar" />
+                <img className="w-10 h-10 rounded-full border-2 border-slate-950 object-cover" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop" alt="avatar" />
+              </div>
+              <div>
+                <div className="flex items-center text-amber-400 text-xs font-bold space-x-1">
+                  <span>★★★★★</span>
+                  <span className="text-white ml-1">4.9 / 5.0</span>
+                </div>
+                <div className="text-[11px] text-slate-400">Trusted by over 45,000 clients and industry leaders</div>
+              </div>
+            </div>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight">
-            ${tagline}
-          </h1>
+          {/* Right Column: Interactive Live Telemetry Glass Card */}
+          <div className="lg:col-span-5">
+            <div className="p-7 rounded-3xl backdrop-blur-2xl bg-slate-900/85 border border-white/10 shadow-2xl shadow-${primary}-500/10 space-y-6 relative overflow-hidden">
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-xl">✦</span>
+                  <div>
+                    <h3 className="font-bold text-white text-sm">Direct Priority Console</h3>
+                    <p className="text-[11px] text-${primary}-400">Real-Time Client Telemetry & Booking</p>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono font-bold animate-pulse">
+                  ● ACTIVE
+                </span>
+              </div>
 
-          <p className="mt-6 text-base sm:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            ${subtagline}
-          </p>
+              {/* Live Metrics */}
+              <div className="grid grid-cols-2 gap-3 text-left">
+                <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-white/5">
+                  <div className="text-[11px] text-slate-400">Response Speed</div>
+                  <div className="text-2xl font-black text-emerald-400 mt-1">&lt; 4 Mins</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Rapid turnaround queue</div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-white/5">
+                  <div className="text-[11px] text-slate-400">Specialists on Duty</div>
+                  <div className="text-2xl font-black text-${primary}-400 mt-1">28 Leads</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Full coverage team</div>
+                </div>
+              </div>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="#contact"
-              className="px-7 py-3.5 rounded-xl bg-${primary}-500 hover:bg-${primary}-400 text-slate-950 font-bold text-sm shadow-xl shadow-${primary}-500/20 transition-all hover:scale-105"
-            >
-              ${cta}
-            </a>
-            <a
-              href="#services"
-              className="px-7 py-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-white font-semibold text-sm border border-slate-700 transition-all"
-            >
-              Explore Capabilities
-            </a>
-          </div>
+              {/* Fast-Track Slot Selector */}
+              <div className="space-y-2 text-left">
+                <label className="block text-xs font-semibold text-slate-300">Fast-Track Next Slot</label>
+                <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                  <button className="py-2.5 px-2 rounded-xl bg-${primary}-500 text-slate-950 font-bold shadow-md">Today, 11:30 AM</button>
+                  <button className="py-2.5 px-2 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-200 border border-white/10">Today, 2:15 PM</button>
+                  <button className="py-2.5 px-2 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-200 border border-white/10">Tomorrow, 9:00 AM</button>
+                </div>
+              </div>
 
-          {/* Quick Stats Grid */}
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-              <div className="text-3xl font-extrabold text-${primary}-400">99.8%</div>
-              <div className="text-xs text-slate-400 mt-1">Client Satisfaction</div>
-            </div>
-            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-              <div className="text-3xl font-extrabold text-white">10,000+</div>
-              <div className="text-xs text-slate-400 mt-1">Happy Customers</div>
-            </div>
-            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-              <div className="text-3xl font-extrabold text-${theme.secondary}-400">15+ Yrs</div>
-              <div className="text-xs text-slate-400 mt-1">Proven Track Record</div>
-            </div>
-            <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-              <div className="text-3xl font-extrabold text-emerald-400">24/7</div>
-              <div className="text-xs text-slate-400 mt-1">Active Client Care</div>
+              <a
+                href="#consultation"
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-${primary}-500 to-${secondary}-600 hover:from-${primary}-400 hover:to-${secondary}-500 text-slate-950 font-bold text-xs shadow-lg shadow-${primary}-500/25 flex items-center justify-center space-x-2 transition-all hover:scale-102"
+              >
+                <span>Reserve Immediate Clinical Slot</span>
+                <span>→</span>
+              </a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Services Section */}
-      <section id="services" className="py-20 bg-slate-950/70 border-t border-slate-800">
+      {/* Bento Grid Showcase Section */}
+      <section id="bento" className="py-20 border-t border-white/10 bg-slate-950/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="px-3.5 py-1.5 rounded-full border border-${primary}-500/30 bg-${primary}-500/10 text-${primary}-400 text-xs font-bold uppercase tracking-wider">
+              Excellence & Infrastructure
+            </span>
+            <h2 className="mt-3 text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+              Engineered for Industry Leadership
+            </h2>
+            <p className="mt-3 text-slate-400 text-sm">
+              Combining world-renowned experts, precision technology, and dedicated round-the-clock client support.
+            </p>
+          </div>
+
+          {/* Bento Grid Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {/* Bento Card 1: Wide Feature with Image */}
+            <div className="md:col-span-2 lg:col-span-2 p-8 rounded-3xl bg-slate-900/90 border border-white/10 flex flex-col justify-between relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent z-10"></div>
+              <img
+                src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&auto=format&fit=crop"
+                alt="Infrastructure"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-40"
+              />
+              <div className="relative z-20">
+                <span className="px-3 py-1 rounded-full bg-${primary}-500/20 text-${primary}-300 text-[11px] font-bold border border-${primary}-500/30">
+                  FLAGSHIP CAPABILITY
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-bold text-white mt-4">
+                  Next-Gen Precision Infrastructure
+                </h3>
+                <p className="text-slate-300 text-xs sm:text-sm mt-2 max-w-md leading-relaxed">
+                  State-of-the-art diagnostic technology offering sub-millimeter precision, 60% faster turnaround times, and superior outcomes.
+                </p>
+              </div>
+
+              <div className="relative z-20 pt-8 flex items-center justify-between border-t border-white/10">
+                <div className="flex items-center space-x-6 text-xs">
+                  <div>
+                    <div className="font-extrabold text-lg text-${primary}-400">99.8%</div>
+                    <div className="text-[10px] text-slate-400">Success Rate</div>
+                  </div>
+                  <div>
+                    <div className="font-extrabold text-lg text-emerald-400">&lt; 24h</div>
+                    <div className="text-[10px] text-slate-400">Avg Resolution</div>
+                  </div>
+                </div>
+                <a href="#consultation" className="text-${primary}-400 text-xs font-bold inline-flex items-center gap-1 hover:underline">
+                  <span>Learn More</span> →
+                </a>
+              </div>
+            </div>
+
+            {/* Bento Card 2 */}
+            <div className="p-7 rounded-3xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-2xl text-emerald-400 mb-4">
+                  ⚡
+                </div>
+                <h4 className="text-lg font-bold text-white">Full-Spectrum Diagnostics</h4>
+                <p className="text-slate-400 text-xs mt-2 leading-relaxed">
+                  High-throughput automated workflows with 30-minute turnarounds and precision accuracy.
+                </p>
+              </div>
+              <div className="pt-4 border-t border-white/5 flex items-center justify-between text-[11px]">
+                <span className="text-emerald-400 font-mono">● 24/7 Active Operations</span>
+                <span className="text-slate-500">Certified ISO</span>
+              </div>
+            </div>
+
+            {/* Bento Card 3 */}
+            <div className="p-7 rounded-3xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-2xl text-amber-400 mb-4">
+                  🛡️
+                </div>
+                <h4 className="text-lg font-bold text-white">Dedicated Patient Suites</h4>
+                <p className="text-slate-400 text-xs mt-2 leading-relaxed">
+                  Comprehensive personalized support with dedicated subspecialists on continuous rotation.
+                </p>
+              </div>
+              <div className="pt-4 border-t border-white/5 flex items-center justify-between text-[11px]">
+                <span className="text-amber-400 font-mono">● Private Concierge</span>
+                <span className="text-slate-500">Zero Delays</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Specialties & Capabilities Grid */}
+      <section id="services" className="py-20 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-xs font-bold text-${primary}-400 uppercase tracking-widest">What We Offer</h2>
             <p className="mt-3 text-3xl font-extrabold sm:text-4xl text-white">Full-Spectrum Capabilities</p>
-            <p className="mt-3 text-slate-400 text-sm">Engineered with high standards, personalized attention, and modern technology.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((s, idx) => (
               <div
                 key={idx}
-                className="p-7 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-${primary}-500/50 transition-all hover:-translate-y-1 group"
+                className="p-7 rounded-3xl bg-slate-900/80 border border-white/10 hover:border-${primary}-500/50 transition-all hover:-translate-y-1 group"
               >
-                <div className="text-3xl mb-4 p-3 w-14 h-14 rounded-2xl bg-${primary}-500/10 border border-${primary}-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="text-3xl mb-4 p-3.5 w-14 h-14 rounded-2xl bg-${primary}-500/10 border border-${primary}-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                   {s.icon}
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2 group-hover:text-${primary}-300 transition-colors">
@@ -626,8 +792,8 @@ export default function App() {
                 <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-4">
                   {s.desc}
                 </p>
-                <a href="#contact" className="text-${primary}-400 text-xs font-bold inline-flex items-center gap-1 hover:underline">
-                  <span>Learn More</span> →
+                <a href="#consultation" className="text-${primary}-400 text-xs font-bold inline-flex items-center gap-1 hover:underline">
+                  <span>Schedule Consultation</span> →
                 </a>
               </div>
             ))}
@@ -635,91 +801,137 @@ export default function App() {
         </div>
       </section>
 
-      {/* Team / Leadership */}
-      <section id="team" className="py-20 border-t border-slate-800">
+      {/* Specialists / Team */}
+      <section id="team" className="py-20 border-t border-white/10 bg-slate-900/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-xs font-bold text-${primary}-400 uppercase tracking-widest">${teamTitle}</h2>
-            <p className="mt-3 text-3xl font-extrabold sm:text-4xl text-white">Meet Our Experts</p>
+            <p className="mt-3 text-3xl font-extrabold sm:text-4xl text-white">Distinguished Department Chiefs</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {team.map((m, idx) => (
-              <div key={idx} className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 text-center hover:border-${primary}-500/40 transition-all">
-                <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-${primary}-600 to-${theme.secondary}-600 flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
+              <div key={idx} className="p-6 rounded-3xl bg-slate-950/80 border border-white/10 text-center hover:border-${primary}-500/40 transition-all">
+                <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-tr from-${primary}-600 to-${secondary}-600 flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
                   {m.name.charAt(0)}
                 </div>
                 <h4 className="font-bold text-white text-base">{m.name}</h4>
                 <p className="text-${primary}-400 text-xs font-medium mt-1">{m.role}</p>
                 <p className="text-slate-400 text-xs mt-2">{m.detail}</p>
-                <div className="text-amber-400 text-xs mt-2 font-mono">{m.rating}</div>
+                <div className="text-amber-400 text-xs mt-3 font-mono">{m.rating}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Interactive Booking / Consultation Section */}
-      <section id="contact" className="py-20 bg-slate-950/80 border-t border-slate-800">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-extrabold text-white">Ready to Get Started?</h2>
-          <p className="mt-2 text-slate-400 text-sm">Send us a message or schedule a consultation. We respond within 15 minutes.</p>
+      {/* Patient / Client Testimonials */}
+      <section id="reviews" className="py-20 border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-xs font-bold text-${primary}-400 uppercase tracking-widest">Verified Feedback</h2>
+            <p className="mt-3 text-3xl font-extrabold sm:text-4xl text-white">Excellence in Every Outcome</p>
+          </div>
 
-          <div className="mt-8 p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl text-left">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {testimonials.map((t, idx) => (
+              <div key={idx} className="p-7 rounded-3xl bg-slate-900/80 border border-white/10 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center space-x-1 text-amber-400 text-xs mb-3">
+                    {'★'.repeat(t.rating)}
+                  </div>
+                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed italic mb-6">
+                    "{t.comment}"
+                  </p>
+                </div>
+                <div className="flex items-center space-x-3 pt-4 border-t border-white/5">
+                  <img src={t.avatar} alt={t.name} className="w-10 h-10 rounded-full object-cover border border-white/10" />
+                  <div>
+                    <h5 className="font-bold text-white text-xs">{t.name}</h5>
+                    <p className="text-slate-400 text-[10px]">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Consultation / Booking Form */}
+      <section id="consultation" className="py-20 border-t border-white/10 bg-slate-900/60">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white">Schedule Your Consultation</h2>
+          <p className="mt-2 text-slate-400 text-xs sm:text-sm">Direct appointment confirmation. Our coordinators respond within 15 minutes.</p>
+
+          <div className="mt-8 p-8 rounded-3xl bg-slate-950 border border-white/10 shadow-2xl text-left">
             {submitted ? (
-              <div className="p-6 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 text-emerald-300 text-sm text-center">
-                <div className="text-3xl mb-2">🎉</div>
-                <h4 className="font-bold text-base text-white">Thank You, {formData.name}!</h4>
-                <p className="mt-2 text-xs text-emerald-200">
-                  Your inquiry has been received. Our team will contact you shortly at {formData.email || formData.phone || 'your details'}.
+              <div className="p-8 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-center space-y-3">
+                <div className="text-4xl">🏥</div>
+                <h4 className="font-bold text-xl text-white">Consultation Confirmed, {formData.name}!</h4>
+                <p className="text-xs text-emerald-200/90 max-w-md mx-auto">
+                  Your appointment for <strong>{formData.department}</strong> has been registered. A confirmation message has been dispatched to {formData.email || formData.phone}.
                 </p>
-                <button onClick={() => setSubmitted(false)} className="mt-4 px-4 py-2 rounded-xl bg-slate-800 text-white text-xs font-semibold">
-                  Send Another Message
+                <button onClick={() => setSubmitted(false)} className="mt-4 px-5 py-2.5 rounded-xl bg-slate-800 text-white text-xs font-semibold hover:bg-slate-700">
+                  Book Another Appointment
                 </button>
               </div>
             ) : (
               <form onSubmit={handleForm} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Your Full Name</label>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Full Name</label>
                     <input
                       type="text"
                       required
-                      placeholder="e.g. John Doe"
+                      placeholder="e.g. Jonathan Edwards"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-${primary}-500"
+                      className="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-${primary}-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Email or Phone</label>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Contact Phone or Email</label>
                     <input
                       type="text"
                       required
                       placeholder="contact@example.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-${primary}-500"
+                      className="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-${primary}-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Message or Specific Request</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Select Specialty / Requirement</label>
+                  <select
+                    value={formData.department}
+                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-${primary}-500"
+                  >
+                    <option value="Primary Consultation">Primary Consultation</option>
+                    <option value="Specialist Review">Specialist Review</option>
+                    <option value="Diagnostic Imaging">Diagnostic Imaging & Testing</option>
+                    <option value="Comprehensive Care">Comprehensive Care</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Notes or Specific Goals</label>
                   <textarea
                     rows="3"
-                    placeholder="Tell us about what you need..."
+                    placeholder="Briefly describe your requirements or preferred appointment times..."
                     value={formData.note}
                     onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-${primary}-500"
+                    className="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-${primary}-500"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-${primary}-500 to-${theme.secondary}-600 hover:from-${primary}-400 hover:to-${theme.secondary}-500 text-slate-950 font-bold text-xs shadow-lg shadow-${primary}-500/25 transition-all"
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-${primary}-500 to-${secondary}-600 hover:from-${primary}-400 hover:to-${secondary}-500 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-${primary}-500/25 transition-all"
                 >
-                  Submit Inquiry
+                  Confirm Priority Booking
                 </button>
               </form>
             )}
@@ -727,17 +939,21 @@ export default function App() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800 bg-slate-950 py-12 text-slate-400 text-xs text-center">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-2">
+      {/* Modern Footer */}
+      <footer className="border-t border-white/10 bg-slate-950 py-12 text-slate-400 text-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-xl bg-${primary}-500 text-slate-950 font-black flex items-center justify-center text-sm">
+              ✦
+            </div>
             <span className="font-bold text-white text-sm">${defaultName}</span>
             <span>© {new Date().getFullYear()}. All rights reserved.</span>
           </div>
-          <div className="flex space-x-6 text-slate-500">
+          <div className="flex space-x-6 text-slate-500 text-xs">
+            <a href="#" className="hover:text-white">Portal</a>
+            <a href="#" className="hover:text-white">Infrastructure</a>
+            <a href="#" className="hover:text-white">Compliance</a>
             <a href="#" className="hover:text-white">Privacy</a>
-            <a href="#" className="hover:text-white">Terms</a>
-            <a href="#" className="hover:text-white">Support</a>
           </div>
         </div>
       </footer>

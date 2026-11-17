@@ -13,10 +13,20 @@ router.post('/generate', optionalAuth, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide a prompt describing the website.' });
     }
 
+    const headerGemini = req.headers['x-gemini-key'];
+    const validHeaderGemini = headerGemini && headerGemini.trim().length > 25 ? headerGemini.trim() : null;
+    const geminiKey = validHeaderGemini || process.env.GEMINI_API_KEY;
+    const openrouterKey = req.headers['x-openrouter-key'] || process.env.OPENROUTER_API_KEY;
+    // Prefer gemini if a key is available
+    const requestedProvider = req.headers['x-ai-provider'];
+    const provider = (requestedProvider && requestedProvider !== 'universal')
+      ? requestedProvider
+      : (geminiKey ? 'gemini' : openrouterKey ? 'openrouter' : 'universal');
+
     const customOptions = {
-      geminiKey: req.headers['x-gemini-key'] || process.env.GEMINI_API_KEY,
-      openrouterKey: req.headers['x-openrouter-key'] || process.env.OPENROUTER_API_KEY,
-      provider: req.headers['x-ai-provider'] || process.env.AI_PROVIDER
+      geminiKey,
+      openrouterKey,
+      provider
     };
 
     console.log(`✨ Generating website for prompt: "${prompt.substring(0, 80)}..."`);
@@ -45,10 +55,20 @@ router.post('/refine', optionalAuth, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide an update instruction.' });
     }
 
+    const headerGemini = req.headers['x-gemini-key'];
+    const validHeaderGemini = headerGemini && headerGemini.trim().length > 25 ? headerGemini.trim() : null;
+    const geminiKey = validHeaderGemini || process.env.GEMINI_API_KEY;
+    const openrouterKey = req.headers['x-openrouter-key'] || process.env.OPENROUTER_API_KEY;
+    // Prefer gemini if a key is available
+    const requestedProvider = req.headers['x-ai-provider'];
+    const provider = (requestedProvider && requestedProvider !== 'universal')
+      ? requestedProvider
+      : (geminiKey ? 'gemini' : openrouterKey ? 'openrouter' : 'universal');
+
     const customOptions = {
-      geminiKey: req.headers['x-gemini-key'] || process.env.GEMINI_API_KEY,
-      openrouterKey: req.headers['x-openrouter-key'] || process.env.OPENROUTER_API_KEY,
-      provider: req.headers['x-ai-provider'] || process.env.AI_PROVIDER
+      geminiKey,
+      openrouterKey,
+      provider
     };
 
     console.log(`🔄 Refining website: "${prompt.substring(0, 80)}..."`);
